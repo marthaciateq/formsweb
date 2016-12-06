@@ -29,9 +29,13 @@
         function changeTitle(input) {
             input.val("");
         }
-        function getRequerido() {
+        function getBottom(type) {
             var div;
-            div = $('<div class="col-sm-12 pull-right divrequerido"><label class="pull-left col-sm-3"># Elementos a seleccionar:</label><div class="pull-left col-sm-1"><input type="text" class="form-control input-sm minimo" id="minimo2" placeholder="Minímo de opciones a seleccionar"></div><div class="pull-right voffset1 offset1"><input class="requerido" type="checkbox" data-size="small" checked></div></div>');
+            div = $('<div class="col-sm-12 pull-right divBottom"></div>');
+            div2 = $('<label class="pull-left col-sm-3"># Elementos a seleccionar:</label><div class="pull-left col-sm-1"><input type="text" class="form-control input-sm minimo" id="minimo2" placeholder="Minímo de opciones a seleccionar"></div>');
+            if (type == "checkbox") div.append(div2);
+            div3 = $('<div class="pull-right voffset1 offset1"><input class="requerido" type="checkbox" data-size="small" checked/></div>');
+            div.append(div3);
             div.find('.requerido').bootstrapSwitch(
                 { onText: 'requerido', offText: 'no req.' }
             );
@@ -44,11 +48,11 @@
             return div
         }
         function addControl(el) {
-            var control,element;
+            var control,element,type='';
             element = el.parent().parent().parent().parent();
             //alert(el.html());
             element.find("#control").remove();
-            element.find(".divrequerido").remove();
+            element.find(".divBottom").remove();
             element.find(".divseparador").remove();
             control = $('<div id="control" class="voffset1 col-sm-9"></div>');
             switch (el.html()) {
@@ -61,6 +65,7 @@
                     control.append(addOtOpcion("radio"));
                     break;
                 case "Casilla de Verificación":
+                    type = "checkbox";
                     control.find('#otoption').remove();
                     control.append(addOption("checkbox"));
                     control.append(addOtOpcion("checkbox"));
@@ -76,7 +81,7 @@
 
             }
             element.append(control);
-            element.append(getRequerido());
+            element.append(getBottom(type));
             element.append(getSeparador());
         }
         function removeElement(nelemento) {
@@ -186,10 +191,11 @@
                             idform: row.idform
                         },
                         onsuccess: function (r) {
-                            var i = 0,control;
+                            var i = 0,control,type;
                             nelemento = 0;
                             while (i < r.length) {
                                 var element;
+                                type = "";
                                 element = addElement(r[i].descripcionElemento);
                                 control = $('<div id="control" class=" col-sm-9 voffset1"></div>');
                                 do {
@@ -203,6 +209,7 @@
                                             control.append(addOtOpcion());
                                             break;
                                         case 2:
+                                            type = 'checkbox';
                                             control.find('#otoption').remove();
                                             control.append(addOption("checkbox", r[i].descripcionOpcion));
                                             control.append(addOtOpcion("checkbox"));
@@ -217,7 +224,7 @@
                                     i++;
                                 } while (r[i] && (r[i - 1].idformElemento == r[i].idformElemento))
                                 element.append(control);
-                                element.append(getRequerido());
+                                element.append(getBottom(type));
                                 element.append(getSeparador());
                                 element.find('.requerido').bootstrapSwitch('state', r[i - 1].requerido == 'S' ? true : false);
                                 element.find('.minimo').val(r[i - 1].minimoElemento);
