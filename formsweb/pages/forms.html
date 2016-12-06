@@ -31,9 +31,9 @@
         }
         function getRequerido() {
             var div;
-            div = $('<div class="col-sm-12 pull-right divrequerido"><label class="pull-left control-label col-sm-3"># Elementos a seleccionar:</label><div class="col-sm-1 pull-left .minimo"><input type="text" class="form-control input-sm" id="minimo2" placeholder="Minímo de opciones a seleccionar"></div><div class="pull-right voffset1""><input class="requerido input-sm" type="checkbox" data-size="small" checked></div></div>');
+            div = $('<div class="col-sm-12 pull-right divrequerido"><label class="pull-left col-sm-3"># Elementos a seleccionar:</label><div class="pull-left col-sm-1"><input type="text" class="form-control input-sm minimo" id="minimo2" placeholder="Minímo de opciones a seleccionar"></div><div class="pull-right voffset1 offset1"><input class="requerido" type="checkbox" data-size="small" checked></div></div>');
             div.find('.requerido').bootstrapSwitch(
-                { onText: 'requerido', offText: 'NO requerido' }
+                { onText: 'requerido', offText: 'no req.' }
             );
             return div;
         }
@@ -172,6 +172,7 @@
                 $("#titulo").val("");
                 $("#descripcion").val("");
                 $("#fcaducidad").val("");
+                $("#minimo").val(null);
 
                 $("#tabsElemento").show();
                 if (row) {
@@ -219,9 +220,8 @@
                                 element.append(getRequerido());
                                 element.append(getSeparador());
                                 element.find('.requerido').bootstrapSwitch('state', r[i - 1].requerido == 'S' ? true : false);
-                                element.find('.minimo').val(r[i - 1].minimo);
+                                element.find('.minimo').val(r[i - 1].minimoElemento);
                             }
-
                             scrollBottom();
                         }
                     });
@@ -282,13 +282,11 @@
                 var opcion = [];
                 var control = $(element).find("#control");
                 elemento[0] = index
-                elemento[2] = Mi.MiTextVal($(element).find(".delemento"));
                 if (control.children(":first").children(":first").attr('type') == "text") {
                     elemento[1] = 0; //textbox
                     opcion[0] = index;
                     opcion[1] = null;
-                    opcion[2] = null;
-                    opcion[3] = 1;
+                    opcion[2] = 1;
                     opciones.push(opcion);
                 } else {
                     if (control.children(":first").children(":first").children(":first").attr('type') == "radio" || control.children(":first").children(":first").children(":first").attr('type') == "checkbox") {
@@ -303,8 +301,7 @@
                             opcion = [];
                             opcion[0] = index;
                             opcion[1] = $(elemento).val();
-                            opcion[2] = $(element).find(".minimo").val();
-                            opcion[3] = orden2;
+                            opcion[2] = orden2;
                             opciones.push(opcion);
                         });
                     }
@@ -313,8 +310,7 @@
                             elemento[1] = 3; //Fecha
                             opcion[0] = index;
                             opcion[1] = null;
-                            opcion[2] = null;
-                            opcion[3] = 1;
+                            opcion[2] = 1;
                             opciones.push(opcion);
                         }
                         else {
@@ -322,8 +318,7 @@
                                 elemento[1] = 4; //Hora
                                 opcion[0] = index;
                                 opcion[1] = null;
-                                opcion[2] = null;
-                                opcion[3] = 1;
+                                opcion[2] = 1;
                                 opciones.push(opcion);
                             }
                             else {
@@ -332,6 +327,8 @@
                         }
                     }
                 }
+                elemento[2] = Mi.MiTextVal($(element).find(".delemento"));
+                elemento[3] = $(element).find(".minimo").val();
                 elemento[4] = index;
                 elemento[5] = $(element).find(".requerido").bootstrapSwitch('state') == true ? 'S' : 'N';
                 elementos.push(elemento);
