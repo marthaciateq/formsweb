@@ -1,0 +1,168 @@
+﻿/*default trasition*/
+.transition,
+.transition:hover,
+.transition:focus {
+  -webkit-transition: all 150ms ease-in-out;
+  -moz-transition: all 150ms ease-in-out;
+  -ms-transition: all 150ms ease-in-out;
+  -o-transition: all 150ms ease-in-out;
+  transition: all 150ms ease-in-out;
+}
+
+html, body {
+  position: relative;
+  height: 100%;
+  /*background-color: #e5e9ec;*/
+}
+
+#side-menu {
+  background-color: #003d4d;
+  padding-top: 2rem;
+  height: 100%;
+  position: fixed;
+}
+
+
+#side-menu ul.nav {
+  margin-top: 1rem;
+}
+
+
+#side-menu ul.nav a {
+  color: #8b91a0;
+}
+
+#side-menu ul.nav a:hover,
+#side-menu ul.nav a:focus {
+  color: #FFF;
+  background-color: inherit;
+  outline: none;
+}
+
+#side-menu ul.nav a .glyphicon {
+  margin-right: 0.7rem;
+}
+
+
+#side-menu ul.nav a .glyphicon.pull-right {
+  margin-top: 0.2rem;
+  will-change: transform;
+}
+
+#side-menu ul.nav a:focus .glyphicon.pull-right {
+  -moz-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+}
+
+#side-menu ul.nav ul {
+  margin-left: 10%;
+}
+
+#side-menu ul.nav ul a {
+  display: block;
+  background-color: #005266;
+  padding: 1rem;
+  margin-bottom: 0.3rem;
+  border-radius: 0.25em;
+}
+
+#side-menu ul.nav ul a:hover {
+  text-decoration: none;
+  background-color: #006680;
+}
+
+#top-menu ul.nav a .glyphicon {
+  margin-right: 0.7rem;
+}
+
+.table tbody th.success td {
+  background-color: #dff0d8;
+}
+.table tbody th.error td {
+  background-color: #f2dede;
+}
+.table tbody th.info td {
+  background-color: #d9edf7;
+}
+.table tbody th.warning td {
+  background-color: lightgoldenrodyellow;
+}
+
+
+/* change border radius for the tab , apply corners on top*/
+
+#exTab3 .nav-pills > li > a {
+  border-radius: 4px 4px 0 0 ;
+}
+
+#exTab3 .tab-content {
+  /*color : white;*/
+  background-color: lightgrey;
+  padding : 5px 0px;
+}
+
+#form-menu ul.nav li > a  > span {
+  margin-right: 0.9rem;
+}
+
+section#intro-header {
+  background-image: url(../imgs/landscape.jpg);
+  background-size: cover;
+}
+
+section#intro-header .wrap-headline {
+  position: relative;
+  padding-top: 3%;
+  padding-bottom: 35%;
+}
+
+section .wrap-form {
+  padding-left: 20%;
+}
+
+section#intro-header h1,
+section#intro-header h2,
+section .control-label {
+  color: #FFF;
+}
+
+section#intro-header h2 {
+  font-size: 1.5rem;
+}
+
+section#intro-header hr {
+  width: 60%;
+}
+
+.voffset  { margin-top: 2px; }
+.voffset1 { margin-top: 5px; }
+.voffset2 { margin-top: 10px; }
+.voffset3 { margin-top: 15px; }
+.voffset4 { margin-top: 30px; }
+.voffset5 { margin-top: 40px; }
+.voffset6 { margin-top: 60px; }
+.voffset7 { margin-top: 80px; }
+.voffset8 { margin-top: 100px; }
+.voffset9 { margin-top: 150px; }
+
+.gi-2x{font-size: 2em;}
+
+.table-header {
+    background-color: #006680;
+    color:white;
+}
+
+
+
+
+
+
+
+
+
+
+
+

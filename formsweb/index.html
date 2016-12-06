@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Creación de formularios</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <script src="js/Mi.js"></script>
+    <script language="javascript">
+        function _onload() {
+            Mi.Template.load()
+        }
+    </script>
+</head>
+<body onload="_onload()">
+    <section id="intro-header">
+        <div class="container">
+            <div class="row">
+                <div class="wrap-headline">
+                    <h1 class="text-center">FORMS</h1>
+                    <h2 class="text-center">Aplicación para Creación de Formularios</h2>
+                    <hr>
+                    <div class="wrap-form">
+                        <form class="form-horizontal">
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label" for="lg">Usuario</label>
+                                <div class="col-sm-4">
+                                    <input class="form-control" type="text" id="login" placeholder="Email">
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm">
+                                <label class="col-sm-2 control-label" for="sm">Password</label>
+                                <div class="col-sm-4">
+                                    <input class="form-control" type="password" id="password" placeholder="Password">
+                                </div>
+                            </div>
+                            <div class="form-group form-group-sm ">
+                                <div class="col-xs-offset-3">
+                                    <a class="btn btn-primary btn-lg" id="acceso" onclick="Mi.Template.acceso()" role="button">
+                                        Entrar
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
+

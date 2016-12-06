@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <script type="text/javascript" src="../js/Mi.js"></script>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script type="text/javascript">
+        function _onload() {
+            Mi.Modal.confirm('¿Esta usted seguro de cerrar su sesión?',
+                    function () {
+                        Mi.Cookie.remove('SESIONFORMS');
+                        window.location.href = Mi.webHome + 'index.html';
+                    }
+                );
+        }
+    </script>
+</head>
+<body onload="_onload()">
+</body>
+</html>

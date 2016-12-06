@@ -1,0 +1,632 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Formularios</title>
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/forms.css">
+    <link rel="stylesheet" href="../css/bootstrap-switch.min.css" />
+    <script src="../js/Mi.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="../js/chosen.jquery.min.js"></script>
+    <!-- Bootstrap Date-Picker Plugin -->
+    <script type="text/javascript" src="../js/bootstrap-datepicker.min.js"></script>
+    <link rel="stylesheet" href="../css/bootstrap-datepicker.min.css" />
+    <link rel="stylesheet" href="../css/chosen.css">
+    <!-- Bootstrap toogle -->
+    <script type="text/javascript" src="../js/bootstrap-switch.min.js"></script>
+    <script language="javascript">
+        var nelemento = 0;
+        function clickOnDiv() {
+            alert("Se dio click en el div");
+        }
+        function changeInput() {
+            $('.option').replaceWith($('<input class="checkbox" type="checkbox">'));
+        }
+        function changeTitle(input) {
+            input.val("");
+        }
+        function getRequerido() {
+            var div;
+            div = $('<div class="col-sm-12 pull-right divrequerido"><label class="pull-left control-label col-sm-3"># Elementos a seleccionar:</label><div class="col-sm-1 pull-left .minimo"><input type="text" class="form-control input-sm" id="minimo2" placeholder="Minímo de opciones a seleccionar"></div><div class="pull-right voffset1""><input class="requerido input-sm" type="checkbox" data-size="small" checked></div></div>');
+            div.find('.requerido').bootstrapSwitch(
+                { onText: 'requerido', offText: 'NO requerido' }
+            );
+            return div;
+        }
+        function getSeparador() {
+            var div;
+            div = $('<div class="col-sm-12 divseparador" style="margin-top:10px;margin-bottom:10px;border-top: 1px solid #aaaaaa;border-bottom: 1px solid #ffffff;"></div>');
+
+            return div
+        }
+        function addControl(el) {
+            var control,element;
+            element = el.parent().parent().parent().parent();
+            //alert(el.html());
+            element.find("#control").remove();
+            element.find(".divrequerido").remove();
+            element.find(".divseparador").remove();
+            control = $('<div id="control" class="voffset1 col-sm-9"></div>');
+            switch (el.html()) {
+                case "Respuesta Breve":
+                    control.append(addRespuestaBreve());
+                    break;
+                case "Opción múltiple":
+                    control.find('#otoption').remove();
+                    control.append(addOption("radio"));
+                    control.append(addOtOpcion("radio"));
+                    break;
+                case "Casilla de Verificación":
+                    control.find('#otoption').remove();
+                    control.append(addOption("checkbox"));
+                    control.append(addOtOpcion("checkbox"));
+                    break;
+                case "Fecha":
+                    control.append(addFecha());
+                    break;
+                case "Hora":
+                    control.append(addHora());
+                    break;
+                default: alert("Otra opción")
+                    return;
+
+            }
+            element.append(control);
+            element.append(getRequerido());
+            element.append(getSeparador());
+        }
+        function removeElement(nelemento) {
+            $("#elemento"+nelemento).remove();
+        }
+        function removeOption(option) {
+            option.remove();
+        }
+        function addElement(delemento) {
+            var elemento;
+            elemento = $('<div id=elemento' + nelemento + ' class="elemento col-sm-10 sortable voffset1"><div  class="pull-left col-sm-0 nelemento">' + (nelemento+1) + '</div><div class="pull-left col-sm-8"><textarea class="form-control delemento input-sm" rows="2" placeholder="Pregunta sin titulo" onclick="changeTitle($(this))"/></div></div>');
+            $('<span class="pull-right" onclick="removeElement(' + nelemento + ')"><img src="../imgs/delete2-icon.png" width="30px" height="30px"/></span>').appendTo(elemento);
+            if (delemento != null) elemento.find(".delemento").val(delemento)
+            elemento.append(createDropwndown());
+
+            $("#dpregunta").append(elemento);
+            $("#dpregunta").sortable({
+                tolerance: 'pointer',
+                placeholder: 'elemento',
+                forceHelperSize: true,
+                stop: function (event, ui) {
+                    $(".nelemento").each(function (index) {
+                        $(this).text(index+1);
+                    });
+                }
+            });
+            nelemento++;
+            return elemento;
+        }
+        function addOptiontoControl(control, type) {
+            if(type!="radio" && type!="checkbox") type="radio";
+            control.find('#otoption').remove();
+            control.append(addOption(type));
+            control.append(addOtOpcion(type));
+        }
+
+        function addOtOpcion(type) {
+            if (type != "radio" && type != "checkbox") type = "radio";
+            var otoption = $('<div id="otoption" class="col-sm-12"><a href="#" onclick="addOptiontoControl($(this).parent().parent(),'+"'"+type +"'"+ ')">Otra Opción</a></div>');
+            otoption.addClass(type);
+            return otoption;
+        }
+        function addFecha() {
+            var fecha;
+            fecha = $('<span class="glyphicon glyphicon-calendar ifecha"> dd/mm/aaaa</span>');
+            return fecha;
+        }
+        function addHora() {
+            var hora;
+            hora = $('<span class="glyphicon glyphicon-time ihora"> hh:mm </span>');
+            return hora;
+        }
+        function addOption(type,respuesta) {
+            var option, otoption, div, type;
+            if (typeof (type) != "string") type = "radio";
+            if (type != "radio" && type != "checkbox") type = "radio";
+
+            option = $('<div class="col-sm-12"><div class="col-sm-10 pull-left"><input class=' + (type == "radio" ? 'radio' : 'checkbox') + ' pull-left " type="' + type + '" disabled/><input class="form-control respuesta input-sm" type="text" id="optiontext" placeholder="Opcion1"/></div><span onclick="removeOption($(this).parent())"><img src="../imgs/delete-icon.png" width="10px" height="10px"/></span></div>');
+            option.addClass(type);
+            if(respuesta!=null) option.find(".respuesta").val(respuesta)
+            return option;
+        }
+        function addRespuestaBreve() {
+            var option;
+            option = $('<div class="col-sm-11 voffset1"><input class="form-control respuesta input-sm" type="text" id="respuesta" placeholder="Respuesta"></div>');
+            return option;
+        }
+        function createDropwndown() {
+            var list = [['Respuesta Breve', 'Opción múltiple', 'Casilla de Verificación'], ['Fecha', 'Hora']];
+            var titulo = "Tipos de control";
+            var div = $('<div class="dropdown pull-right"><button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' + titulo + '<span class="caret"></span></button></div>');
+            var ul, li;
+            ul = $('<ul class="dropdown-menu" aria-labelledby="dropdownMenu1"></ul>');
+            $.each(list, function (index, value) {
+                $.each(value, function (index, value) {
+                    li = $('<li><a href="#" onclick="addControl($(this))">' + value + '</a></li>');
+                    ul.append(li);
+                });
+                ul.append('<li role="separator" class="divider"></li>');
+            });
+            div.append(ul);
+            return div;
+        }
+        function addTextbox() {
+            var textbox = $('<div class="form-group">').append($('<label for="email">Email address:</label>')).append($('<input type="email" class="form-control" id="email">'));
+            $("#elementos").append(textbox);
+        }
+        function scrollBottom() {
+            $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        }
+        function editar(row) {
+            function f1() {
+                $("#titulo").val("");
+                $("#descripcion").val("");
+                $("#fcaducidad").val("");
+
+                $("#tabsElemento").show();
+                if (row) {
+                    $("#titulo").val(row.titulo);
+                    $("#descripcion").val(row.descripcion);
+                    $("#fcaducidad").val(row.fcaducidad);
+                    $("#minimo").val(row.minimo);
+                    Mi.AJAX.request({
+                        data: {
+                            NAME: 'sps_formsElementos_buscar',
+                            idform: row.idform
+                        },
+                        onsuccess: function (r) {
+                            var i = 0,control;
+                            nelemento = 0;
+                            while (i < r.length) {
+                                var element;
+                                element = addElement(r[i].descripcionElemento);
+                                control = $('<div id="control" class=" col-sm-9 voffset1"></div>');
+                                do {
+                                    switch (r[i].elemento) {
+                                        case 0:
+                                            control.append(addRespuestaBreve());
+                                            break;
+                                        case 1:
+                                            control.find('#otoption').remove();
+                                            control.append(addOption("radio",r[i].descripcionOpcion));
+                                            control.append(addOtOpcion());
+                                            break;
+                                        case 2:
+                                            control.find('#otoption').remove();
+                                            control.append(addOption("checkbox", r[i].descripcionOpcion));
+                                            control.append(addOtOpcion("checkbox"));
+                                            break;
+                                        case 3:
+                                            control.append(addFecha());
+                                            break;
+                                        case 4:
+                                            control.append(addHora());
+                                            break;
+                                    }
+                                    i++;
+                                } while (r[i] && (r[i - 1].idformElemento == r[i].idformElemento))
+                                element.append(control);
+                                element.append(getRequerido());
+                                element.append(getSeparador());
+                                element.find('.requerido').bootstrapSwitch('state', r[i - 1].requerido == 'S' ? true : false);
+                                element.find('.minimo').val(r[i - 1].minimo);
+                            }
+
+                            scrollBottom();
+                        }
+                    });
+                }
+            }
+            $("#dpregunta").children().remove();
+            $("#listado").hide();
+            $("#guardar").off('click').click(guardar);
+            $("#nuevoElemento").off('click').click(function () {
+                var elemento;
+                elemento = addElement();
+                scrollBottom();
+            });
+            f1();
+        }
+        function buscar(busqueda) {
+            Mi.AJAX.request({
+                data: {
+                    NAME: 'sps_forms_buscar',
+                    buscar: busqueda
+                },
+                onsuccess: function (r) {
+                    listado(r);
+                }
+            });
+        }
+        function listado(r) {
+            $("#listado").empty();
+            $("#tabsElemento").hide();
+            $("#listado").show();
+            $("#top-menu").find('li').removeClass('disabled');
+
+            var table = Mi.table({
+                head: {
+                    data: [['Titulo', 'Fecha de expiración', 'Estado']]
+                },
+                body: {
+                    data: r,
+                    cols: ['titulo', 'fcaducidad', 'estado']
+                },
+                addCheckbox: true
+            });
+
+            table.children('thead').children('tr').addClass('table-header');
+            table.appendTo($("#listado"))
+            table.prop("id", "registros")
+        }
+
+        function guardar(row) {
+            var row = $("#registros").MiSelection({ onlyFirst: true }).eq(0).data('row');
+            var type;
+            var elementos = [];
+            var opciones = [];
+            var orden = 0;
+            var min = 0; max = 0;
+            $(".elemento").each(function (index, element) {
+                var elemento = [];
+                var opcion = [];
+                var control = $(element).find("#control");
+                elemento[0] = index
+                elemento[2] = Mi.MiTextVal($(element).find(".delemento"));
+                if (control.children(":first").children(":first").attr('type') == "text") {
+                    elemento[1] = 0; //textbox
+                    opcion[0] = index;
+                    opcion[1] = null;
+                    opcion[2] = null;
+                    opcion[3] = 1;
+                    opciones.push(opcion);
+                } else {
+                    if (control.children(":first").children(":first").children(":first").attr('type') == "radio" || control.children(":first").children(":first").children(":first").attr('type') == "checkbox") {
+                        type = control.children(":first").children(":first").children(":first").attr('type');
+
+                        if (type=="radio") elemento[1] = 1;
+                        else elemento[1] = 2 //Checkbox
+
+                        var orden2 = 0;
+                        control.find(".respuesta").each(function (index2, elemento) {
+                            orden2++;
+                            opcion = [];
+                            opcion[0] = index;
+                            opcion[1] = $(elemento).val();
+                            opcion[2] = $(element).find(".minimo").val();
+                            opcion[3] = orden2;
+                            opciones.push(opcion);
+                        });
+                    }
+                    else {
+                        if (control.children(":first").hasClass("ifecha")) {
+                            elemento[1] = 3; //Fecha
+                            opcion[0] = index;
+                            opcion[1] = null;
+                            opcion[2] = null;
+                            opcion[3] = 1;
+                            opciones.push(opcion);
+                        }
+                        else {
+                            if (control.children(":first").hasClass("ihora")) {
+                                elemento[1] = 4; //Hora
+                                opcion[0] = index;
+                                opcion[1] = null;
+                                opcion[2] = null;
+                                opcion[3] = 1;
+                                opciones.push(opcion);
+                            }
+                            else {
+                                alert("otro control");
+                            }
+                        }
+                    }
+                }
+                elemento[4] = index;
+                elemento[5] = $(element).find(".requerido").bootstrapSwitch('state') == true ? 'S' : 'N';
+                elementos.push(elemento);
+            })
+
+            Mi.AJAX.request({
+                data: {
+                    NAME: 'sps_formsweb_guardar',
+                    idform: row ? row.idform : null,
+                    titulo: $("#titulo").val().length == 0 ? null : $("#titulo").val(),
+                    descripcion: $("#descripcion").val() == '' ? null : $("#descripcion").val(),
+                    fcaducidad: $("#fcaducidad").val() == '' ? null : $("#fcaducidad").val(),
+                    minimo: $("#minimo").val(),
+                    elementos: elementos,
+                    opciones: opciones,
+                    validador: row ? row.validador : null
+                },
+                onsuccess: function (r) {
+                    var errores = [];
+                    if(r){
+                        for (var i = 0; i < r.length; i++) {
+                            errores.push(' Se generó el siguiente error: ' + r[i].error);
+                        }
+                        if (r.length > 0) {
+                            Mi.Modal.error(errores.join('\n'));
+                            return
+                        }
+                    }
+                    buscar();
+                    $("#formulario").hide();
+                    $("#listado").show();
+
+                },
+                onerror: function (r) {
+                    $("#formulario").show();
+                    Mi.Modal.error(r);
+                }
+            });
+
+        }
+        function changeTabs() {
+            alert("changeTabs");
+        }
+        function _onload() {
+            Mi.Template.load();
+            Mi.Template.menuTop([
+                {
+                    label: "Nuevo",
+                    onclick: function () {
+                        if ($(this).parent().hasClass('disabled')) return;
+                        $(this).parent().parent().children('li').addClass("disabled");
+                        $(this).parent().removeClass("disabled");
+                        editar();
+                    }, img: "glyphicon-file"
+                },
+                {
+                    label: "Editar",
+                    onclick: function () {
+                        var row;
+                        row = $("#registros").MiSelection({ onlyFirst: true }).eq(0).data('row');
+                        if ($(this).parent().hasClass('disabled')) return;
+                        if (!row) {
+                            Mi.Modal.alert("Por favor seleccione un registro");
+                            return;
+                        }
+                        $(this).parent().parent().children('li').addClass("disabled");
+                        $(this).parent().removeClass("disabled");
+                        editar(row);
+                    },
+                    img: "glyphicon-edit"
+                },
+                {
+                    label: "Borrar",
+                    onclick: function () {
+                        if ($(this).parent().hasClass('disabled')) return;
+                        if (!$("#registros").MiSelection().eq(0).data('row')) {
+                            Mi.Modal.alert("Por favor seleccione un registro");
+                            return;
+                        }
+                        $(this).parent().parent().children('li').addClass("disabled");
+                        $(this).parent().removeClass("disabled");
+                        Mi.Modal.confirm('¿Está usted seguro que desea borrar los formularios seleccionados?',
+                                function () {
+                                    var forms = [];
+                                    $("#registros").MiSelection().each(function () {
+                                        forms.push([$(this).data('row').idform, $(this).data('row').validador]);
+                                    });
+                                    Mi.AJAX.request({
+                                        data: {
+                                            NAME: 'sps_forms_borrar',
+                                            forms: forms
+                                        },
+                                        onsuccess: function (r) {
+                                            var errores = [];
+                                            for (var i = 0; i < r.length; i++) errores.push('El formulario ' + r[i].titulo + ' generó el siguiente error: ' + r[i].error);
+                                            if (r.length == 0) Mi.Modal.alert(forms.length > 1 ? 'Formularios borrados.' : 'Formulario borrado.');
+                                            else Mi.Modal.error(errores.join('\n'));
+                                            buscar();
+                                        },
+                                        onerror: function (r) {
+                                            Mi.Modal.error(r);
+                                        }
+                                    });
+                                }
+                      );
+
+                    }, img: "glyphicon-trash"
+
+                },
+                {
+                    label: "Aprobar",
+                    onclick: function () {
+                        if ($(this).parent().hasClass('disabled')) return;
+                        if (!$("#registros").MiSelection().eq(0).data('row')) {
+                            Mi.Modal.alert("Por favor seleccione un registro");
+                            return;
+                        }
+                        $(this).parent().parent().children('li').addClass("disabled");
+                        $(this).parent().removeClass("disabled");
+                        Mi.Modal.confirm('¿Está usted seguro que desea aprobar los formularios seleccionados?',
+                                function () {
+                                    var forms = [];
+                                    $("#registros").MiSelection().each(function () {
+                                        forms.push([$(this).data('row').idform, $(this).data('row').validador]);
+                                    });
+                                    Mi.AJAX.request({
+                                        data: {
+                                            NAME: 'sps_forms_aprobar',
+                                            forms: forms
+                                        },
+                                        onsuccess: function (r) {
+                                            var errores = [];
+                                            for (var i = 0; i < r.length; i++) errores.push('El formulario ' + r[i].titulo + ' generó el siguiente error: ' + r[i].error);
+                                            if (r.length == 0) Mi.Modal.alert(forms.length > 1 ? 'Formularios aprobados.' : 'Formulario aprobado.');
+                                            else Mi.Modal.error(errores.join('\n'));
+                                            buscar();
+                                        },
+                                        onerror: function (r) {
+                                            Mi.Modal.error(r);
+                                        }
+                                    });
+                                }
+                      );
+                    }, img: "glyphicon-ok"
+                },
+                {
+                    label: "Cancelar",
+                    onclick: function () {
+                        if ($(this).parent().hasClass('disabled')) return;
+                        if (!$("#registros").MiSelection().eq(0).data('row')) {
+                            Mi.Modal.alert("Por favor seleccione un registro");
+                            return;
+                        }
+                        $(this).parent().parent().children('li').addClass("disabled");
+                        $(this).parent().removeClass("disabled");
+                        Mi.Modal.confirm('¿Está usted seguro que desea cancelar los formularios seleccionados?',
+                                function () {
+                                    var forms = [];
+                                    $("#registros").MiSelection().each(function () {
+                                        forms.push([$(this).data('row').idform, $(this).data('row').validador]);
+                                    });
+                                    Mi.AJAX.request({
+                                        data: {
+                                            NAME: 'sps_forms_cancelar',
+                                            forms: forms
+                                        },
+                                        onsuccess: function (r) {
+                                            var errores = [];
+                                            for (var i = 0; i < r.length; i++) errores.push('El formulario ' + r[i].titulo + ' generó el siguiente error: ' + r[i].error);
+                                            if (r.length == 0) Mi.Modal.alert(forms.length > 1 ? 'Formularios cancelados.' : 'Formulario cancelado.');
+                                            else Mi.Modal.error(errores.join('\n'));
+                                            buscar();
+                                        },
+                                        onerror: function (r) {
+                                            Mi.Modal.error(r);
+                                        }
+                                    });
+                                }
+                      );
+                    }, img: "glyphicon-remove"
+                }
+            ], "Formularios");
+            $("#bbuscar").click(function () {
+                buscar($("#txtbuscar").val());
+            });
+            $("#bcancelar").click(function () {
+                buscar();
+            });
+            $("#tabsElemento").hide();
+
+            var date_input = $('input[name="fcaducidad"]'); //our date input has the name "date"
+            var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
+            var options = {
+                format: 'dd/mm/yyyy',
+                container: container,
+                todayHighlight: true,
+                autoclose: true,
+            };
+            date_input.datepicker(options);
+
+            $("#listado").hide();
+            Mi.AJAX.request({
+                data: [
+                    {
+                        NAME: 'sps_forms_buscar'
+                    }
+                ],
+                onsuccess: function (r) {
+                    listado(r);
+                }
+            });
+
+        }
+    </script>
+</head>
+<body onload="_onload()">
+    <div id="div_principal" class="container-fluid">
+        <div id="row_principal" class="row">
+            <div id="side-menu" class="col-sm-2 hidden-xs" data-spy="affix" data-offset-top="0"></div>
+            <div id="opciones" class="col-sm-offset-2 col-sm-10"></div>
+            <div id="main" class="col-sm-offset-2 col-sm-8">
+                <div id="listado" class="col-sm-offset-1 col-sm-8"></div>
+                <div id="tabsElemento">
+                    <div id="exTab3" class="container">
+                        <ul class="nav nav-pills">
+                            <li class="active">
+                                <a href="#datosgrales" data-toggle="tab">Datos Generales</a>
+                            </li>
+                            <li>
+                                <a href="#detalle" data-toggle="tab">Detalle</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content clearfix">
+                            <div class="tab-pane active" id="datosgrales">
+                                <div class="col-sm-12">
+                                    <div class="form-group  clearfix">
+                                        <label class="control-label col-sm-2 ">Titulo:</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" id="titulo" placeholder="Titulo">
+                                        </div>
+                                    </div>
+                                    <div class="form-group  clearfix">
+                                        <label class="control-label col-sm-2">Descripcion:</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" id="descripcion" placeholder="Descripción">
+                                        </div>
+                                    </div>
+                                    <div class="form-group  clearfix">
+                                        <label class="control-label col-sm-2">Número minimo de elementos:</label>
+                                        <div class="col-sm-2">
+                                            <input type="text" class="form-control" id="minimo" placeholder="Minímo de preguntas a responder">
+                                        </div>
+                                    </div>
+                                    <!--<div class="form-group  clearfix">
+                                        <label class="control-label col-sm-2">Número máximo de elementos:</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="max" placeholder="max">
+                                        </div>
+                                    </div>-->
+                                    <div class="form-group clearfix">
+                                        <label class="control-label col-sm-2">Fecha de expiración:</label>
+                                        <div class="col-sm-10">
+                                            <input class="form-control" id="fcaducidad" name="fcaducidad" placeholder="MM/DD/YYY" type="text" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="detalle">
+                                
+                                    <div id="bherramienta" class="col-sm-12">
+                                        <div class="col-sm-12" id="form-menu">
+                                            <ul class="nav nav-pills navbar-right">
+                                                <li><a href="#" id="nuevoElemento"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>Nuevo Elemento</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div id="dpregunta" class="col-sm-12">
+
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="help-block"></div>
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <button id="guardar" class="btn btn-success">Guardar</button>
+                            <button id="bcancelar" class="btn btn-danger">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
