@@ -51,12 +51,12 @@ BEGIN
 				col1,
 				CONVERT(int, NULLIF(col2, '')),
 				NULLIF(col3, ''),
-				CONVERT(int,col4),				
+				CONVERT(int,NULLIF(col4, '')),				
 				CONVERT(int,col5),
 				NULLIF(col6, '')
 			from fn_table(6,@elementos)
 			
-		if (select COUNT(*) from @telementos) <= 0 execute sp_error 'U', 'Favor de capturar la menos un elemento.' 
+		if (select COUNT(*) from @telementos) <= 0 execute sp_error 'U', 'Favor de capturar al menos un elemento.' 
 		
 		declare @topciones table(
 			idformElemento varchar(max),			

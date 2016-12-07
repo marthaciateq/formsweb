@@ -346,3 +346,11 @@ Mi.MiTextVal = function (e, value) {
         else e.val(value)
     }
 }
+
+Mi.MiNumberMiVal = function (e, value) {
+    if ($.type(value) == 'undefined') return Mi.Convert.stringToNumber(e.val())
+    else {
+        if (!$.isNumeric(parseFloat(value))) e.val('')
+        else e.val(Mi.Convert.numberToString(value, e.data('params').decimales, e.data('params').separador))
+    }
+}

@@ -30,15 +30,23 @@
             input.val("");
         }
         function getBottom(type) {
-            var div;
+            var div,divminimo,minimo;
             div = $('<div class="col-sm-12 pull-right divBottom"></div>');
-            div2 = $('<label class="pull-left col-sm-3"># Elementos a seleccionar:</label><div class="pull-left col-sm-1"><input type="text" class="form-control input-sm minimo" id="minimo2" placeholder="Minímo de opciones a seleccionar"></div>');
-            if (type == "checkbox") div.append(div2);
+            minimo = Mi.Input.number();
+            minimo.addClass("form-control").addClass("imput-sm").addClass("minimo");
+            minimo.prop("id", "minimo2");
+            divminimo=$('<div class="pull-left col-sm-1"></div>').append(minimo);
+            div2 = $('<label class="pull-left col-sm-3"># Elementos a seleccionar:</label>');
+            if (type == "checkbox") {
+                div.append(div2);
+                div.append(divminimo);
+            }
             div3 = $('<div class="pull-right voffset1 offset1"><input class="requerido" type="checkbox" data-size="small" checked/></div>');
             div.append(div3);
             div.find('.requerido').bootstrapSwitch(
                 { onText: 'requerido', offText: 'no req.' }
             );
+            div.find('.requerido').bootstrapSwitch('state', false);
             return div;
         }
         function getSeparador() {
@@ -84,11 +92,18 @@
             element.append(getBottom(type));
             element.append(getSeparador());
         }
-        function removeElement(nelemento) {
-            $("#elemento"+nelemento).remove();
+        function removeElement(numelemento) {
+            $("#elemento" + numelemento).remove();
+            nelemento = nelemento - 1;
+            ordenarElementos();
         }
         function removeOption(option) {
             option.remove();
+        }
+        function ordenarElementos() {
+            $(".nelemento").each(function (index) {
+                $(this).text(index + 1);
+            });
         }
         function addElement(delemento) {
             var elemento;
@@ -103,9 +118,7 @@
                 placeholder: 'elemento',
                 forceHelperSize: true,
                 stop: function (event, ui) {
-                    $(".nelemento").each(function (index) {
-                        $(this).text(index+1);
-                    });
+                    ordenarElementos();
                 }
             });
             nelemento++;
@@ -227,7 +240,7 @@
                                 element.append(getBottom(type));
                                 element.append(getSeparador());
                                 element.find('.requerido').bootstrapSwitch('state', r[i - 1].requerido == 'S' ? true : false);
-                                element.find('.minimo').val(r[i - 1].minimoElemento);
+                                element.find('.minimo').MiVal(r[i - 1].minimoElemento);
                             }
                             scrollBottom();
                         }
@@ -335,7 +348,7 @@
                     }
                 }
                 elemento[2] = Mi.MiTextVal($(element).find(".delemento"));
-                elemento[3] = $(element).find(".minimo").val();
+                elemento[3] = $(element).find(".minimo").MiVal();
                 elemento[4] = index;
                 elemento[5] = $(element).find(".requerido").bootstrapSwitch('state') == true ? 'S' : 'N';
                 elementos.push(elemento);
