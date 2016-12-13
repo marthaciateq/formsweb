@@ -1,18 +1,33 @@
-CREATE TABLE formsElementos(
-	idformElemento varchar(32) NOT NULL,
-	idform char(32) NOT NULL,
-	elemento int NOT NULL, --(0) textbox (1) textarea (2) listbox 
-	descripcion varchar(max) NOT NULL,
-	minimo int,
-	orden int NOT NULL,
-	requerido char(1), 
-	CONSTRAINT PK_formsElementos PRIMARY KEY (idformElemento),
-	CONSTRAINT CK_formsElementos_elemento CHECK (elemento in (0,1,2,3,4,5,6,7))
-)
+CREATE TABLE [dbo].[formsElementos](
+	[idformElemento] [varchar](32) NOT NULL,
+	[idform] [char](32) NOT NULL,
+	[elemento] [int] NOT NULL,
+	[descripcion] [varchar](max) NOT NULL,
+	[orden] [int] NOT NULL,
+	[minimo] [int] NOT NULL,
+	[requerido] [bit] NULL,
+ CONSTRAINT [PK_formsElementos] PRIMARY KEY CLUSTERED 
+(
+	[idformElemento] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
 GO
 
-ALTER TABLE formsElementos ADD CONSTRAINT FK_formsElementos_idform FOREIGN KEY(idform)
-REFERENCES forms(idform)
-
-CREATE INDEX IX_formsElementos_01 on formsElementos(idform) include(elemento)
+SET ANSI_PADDING OFF
 GO
+
+ALTER TABLE [dbo].[formsElementos]  WITH CHECK ADD  CONSTRAINT [FK_formsElementos_idform] FOREIGN KEY([idform])
+REFERENCES [dbo].[forms] ([idform])
+GO
+
+ALTER TABLE [dbo].[formsElementos] CHECK CONSTRAINT [FK_formsElementos_idform]
+GO
+
+ALTER TABLE [dbo].[formsElementos]  WITH CHECK ADD  CONSTRAINT [CK_formsElementos_elemento] CHECK  (([elemento]=(7) OR [elemento]=(6) OR [elemento]=(5) OR [elemento]=(4) OR [elemento]=(3) OR [elemento]=(2) OR [elemento]=(1) OR [elemento]=(0)))
+GO
+
+ALTER TABLE [dbo].[formsElementos] CHECK CONSTRAINT [CK_formsElementos_elemento]
+GO
+
+
