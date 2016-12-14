@@ -3,7 +3,7 @@
 -- Create date: 12 Dic 2016
 -- Description:	Finaliza la encuesta
 -- =============================================
-CREATE PROCEDURE [dbo].[sps_forms_finalizar] 
+CREATE PROCEDURE sps_forms_finalizar
 	-- Add the parameters for the stored procedure here
 	  @idSession VARCHAR(MAX)
 	, @idForm    CHAR(32)

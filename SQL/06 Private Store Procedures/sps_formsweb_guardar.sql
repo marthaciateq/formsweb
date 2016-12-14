@@ -155,7 +155,7 @@ BEGIN
 					end	
 					
 					insert into formsElementos
-						select a.idformElemento,@idform,a.elemento,a.descripcion,a.minimo,a.orden,a.requerido from @formsElementos a
+						select a.idformElemento,@idform,a.elemento,a.descripcion,a.orden,a.minimo,a.requerido from @formsElementos a
 					
 					insert into felementosOpciones
 						select * from @felementosOpciones
