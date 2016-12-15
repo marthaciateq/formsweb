@@ -55,10 +55,16 @@
 
             return div
         }
+        function sort(element) {
+            $(element).sortable({
+                tolerance: 'pointer',
+                placeholder: 'opcion',
+                forceHelperSize: true
+            });
+        }
         function addControl(el) {
             var control,element,type='';
             element = el.parent().parent().parent().parent();
-            //alert(el.html());
             element.find("#control").remove();
             element.find(".divBottom").remove();
             element.find(".divseparador").remove();
@@ -71,12 +77,14 @@
                     control.find('#otoption').remove();
                     control.append(addOption("radio"));
                     control.append(addOtOpcion("radio"));
+                    sort($(element));
                     break;
                 case "Casilla de Verificación":
                     type = "checkbox";
                     control.find('#otoption').remove();
                     control.append(addOption("checkbox"));
                     control.append(addOtOpcion("checkbox"));
+                    sort($(element));
                     break;
                 case "Fecha":
                     control.append(addFecha());
@@ -129,6 +137,7 @@
             control.find('#otoption').remove();
             control.append(addOption(type));
             control.append(addOtOpcion(type));
+            sort(control.parent());
         }
 
         function addOtOpcion(type) {
@@ -152,9 +161,9 @@
             if (typeof (type) != "string") type = "radio";
             if (type != "radio" && type != "checkbox") type = "radio";
 
-            option = $('<div class="col-sm-12"><div class="col-sm-10 pull-left"><input class=' + (type == "radio" ? 'radio' : 'checkbox') + ' pull-left " type="' + type + '" disabled/><input class="form-control respuesta input-sm" type="text" id="optiontext" placeholder="Opcion1"/></div><span onclick="removeOption($(this).parent())"><img src="../imgs/delete-icon.png" width="10px" height="10px"/></span></div>');
+            option = $('<div class="col-sm-12 opcion sortable"><div class="col-sm-10 pull-left"><input class=' + (type == "radio" ? 'radio' : 'checkbox') + ' pull-left " type="' + type + '" disabled/><input class="form-control respuesta input-sm" type="text" id="optiontext" placeholder="Opcion1"/></div><span onclick="removeOption($(this).parent())"><img src="../imgs/delete-icon.png" width="10px" height="10px"/></span></div>');
             option.addClass(type);
-            if(respuesta!=null) option.find(".respuesta").val(respuesta)
+            if (respuesta != null) option.find(".respuesta").val(respuesta)
             return option;
         }
         function addRespuestaBreve() {
@@ -193,6 +202,7 @@
                 $("#minimo").val(null);
 
                 $("#tabsElemento").show();
+                nelemento = 0;
                 if (row) {
                     $("#titulo").val(row.titulo);
                     $("#descripcion").val(row.descripcion);
@@ -205,7 +215,6 @@
                         },
                         onsuccess: function (r) {
                             var i = 0,control,type;
-                            nelemento = 0;
                             while (i < r.length) {
                                 var element;
                                 type = "";
@@ -220,12 +229,14 @@
                                             control.find('#otoption').remove();
                                             control.append(addOption("radio",r[i].descripcionOpcion));
                                             control.append(addOtOpcion());
+                                            sort($(element));
                                             break;
                                         case 2:
                                             type = 'checkbox';
                                             control.find('#otoption').remove();
                                             control.append(addOption("checkbox", r[i].descripcionOpcion));
                                             control.append(addOtOpcion("checkbox"));
+                                            sort($(element));
                                             break;
                                         case 3:
                                             control.append(addFecha());
@@ -249,6 +260,7 @@
             }
             $("#dpregunta").children().remove();
             $("#listado").hide();
+            $("#busqueda").hide();
             $("#guardar").off('click').click(guardar);
             $("#nuevoElemento").off('click').click(function () {
                 var elemento;
@@ -256,6 +268,20 @@
                 scrollBottom();
             });
             f1();
+        }
+        function bavanzada() {
+            Mi.AJAX.request({
+                data: {
+                    NAME: 'sps_forms_buscar',
+                    titulo: Mi.MiTextVal($("titulo")),
+                    finicio:$("#finicio").val() == '' ? null : $("#finicio").val(),
+                    ffinal: $("#ffinal").val() == '' ? null : $("#ffinal").val(),
+                    estados: $("#ffinal").val() == '' ? null : $("#ffinal").val(),
+                },
+                onsuccess: function (r) {
+                    listado(r);
+                }
+            });
         }
         function buscar(busqueda) {
             Mi.AJAX.request({
@@ -271,6 +297,7 @@
         function listado(r) {
             $("#listado").empty();
             $("#tabsElemento").hide();
+            $("#busqueda").hide();
             $("#listado").show();
             $("#top-menu").find('li').removeClass('disabled');
 
@@ -301,10 +328,10 @@
                 var elemento = [];
                 var opcion = [];
                 var control = $(element).find("#control");
-                elemento[0] = index
+                elemento[0] = index+1
                 if (control.children(":first").children(":first").attr('type') == "text") {
                     elemento[1] = 0; //textbox
-                    opcion[0] = index;
+                    opcion[0] = index+1;
                     opcion[1] = null;
                     opcion[2] = 1;
                     opciones.push(opcion);
@@ -319,7 +346,7 @@
                         control.find(".respuesta").each(function (index2, elemento) {
                             orden2++;
                             opcion = [];
-                            opcion[0] = index;
+                            opcion[0] = index+1;
                             opcion[1] = $(elemento).val();
                             opcion[2] = orden2;
                             opciones.push(opcion);
@@ -328,7 +355,7 @@
                     else {
                         if (control.children(":first").hasClass("ifecha")) {
                             elemento[1] = 3; //Fecha
-                            opcion[0] = index;
+                            opcion[0] = index+1;
                             opcion[1] = null;
                             opcion[2] = 1;
                             opciones.push(opcion);
@@ -336,7 +363,7 @@
                         else {
                             if (control.children(":first").hasClass("ihora")) {
                                 elemento[1] = 4; //Hora
-                                opcion[0] = index;
+                                opcion[0] = index+1;
                                 opcion[1] = null;
                                 opcion[2] = 1;
                                 opciones.push(opcion);
@@ -349,7 +376,7 @@
                 }
                 elemento[2] = Mi.MiTextVal($(element).find(".delemento"));
                 elemento[3] = $(element).find(".minimo").MiVal();
-                elemento[4] = index;
+                elemento[4] = index+1;
                 elemento[5] = $(element).find(".requerido").bootstrapSwitch('state') == true ? 'S' : 'N';
                 elementos.push(elemento);
             })
@@ -370,7 +397,7 @@
                     var errores = [];
                     if(r){
                         for (var i = 0; i < r.length; i++) {
-                            errores.push(' Se generó el siguiente error: ' + r[i].error);
+                            errores.push('Se generó el siguiente error: ' + r[i].error);
                         }
                         if (r.length > 0) {
                             Mi.Modal.error(errores.join('\n'));
@@ -529,7 +556,19 @@
                                 }
                       );
                     }, img: "glyphicon-remove"
-                }
+                },
+                {
+                    label: "Búsqueda Avanzada",
+                    onclick: function () {
+                        if ($(this).parent().hasClass('disabled')) return;
+                        $(this).parent().parent().children('li').addClass("disabled");
+                        $(this).parent().removeClass("disabled");
+                        $("#busqueda").show();
+                        $("#tabsElemento").hide();
+                        $("#listado").hide();
+
+                    }, img: "glyphicon-search"
+                },
             ], "Formularios");
             $("#bbuscar").click(function () {
                 buscar($("#txtbuscar").val());
@@ -537,7 +576,10 @@
             $("#bcancelar").click(function () {
                 buscar();
             });
+
             $("#tabsElemento").hide();
+            $("#busqueda").hide();
+            $("#listado").hide();
 
             var date_input = $('input[name="fcaducidad"]'); //our date input has the name "date"
             var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
@@ -548,8 +590,6 @@
                 autoclose: true,
             };
             date_input.datepicker(options);
-
-            $("#listado").hide();
             Mi.AJAX.request({
                 data: [
                     {
@@ -571,6 +611,46 @@
             <div id="opciones" class="col-sm-offset-2 col-sm-10"></div>
             <div id="main" class="col-sm-offset-2 col-sm-8">
                 <div id="listado" class="col-sm-offset-1 col-sm-8"></div>
+                <div id="busqueda" class="col-sm-offset-1 col-sm-8">
+                    <div class="form-group  clearfix">
+                        <label class="control-label col-sm-2 ">Titulo:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="btitulo" placeholder="Titulo">
+                        </div>
+                    </div>
+                    <div class="form-group  clearfix">
+                        <label class="control-label col-sm-2">Estado:</label>
+                        <div class="col-sm-2">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                    Estados
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Generado</a></li>
+                                    <li><a href="#">Aprobado</a></li>
+                                    <li><a href="#">Cancelado</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="control-label col-sm-2">Fecha de expiración:</label>
+                        <div class="col-sm-10">
+                            <input class="form-control" id="bfcaducidad" name="bfcaducidad" placeholder="MM/DD/YYY" type="text" />
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="control-label col-sm-2">Fecha inicio:</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="bfinicio" name="finicio" placeholder="MM/DD/YYY" type="text" />
+                        </div>
+                        <label class="control-label col-sm-2">Fecha final:</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="fbfinal" name="ffinal" placeholder="MM/DD/YYY" type="text" />
+                        </div>
+                    </div>
+                </div>
                 <div id="tabsElemento">
                     <div id="exTab3" class="container">
                         <ul class="nav nav-pills">
@@ -603,12 +683,6 @@
                                             <input type="text" class="form-control" id="minimo" placeholder="Minímo de preguntas a responder">
                                         </div>
                                     </div>
-                                    <!--<div class="form-group  clearfix">
-                                        <label class="control-label col-sm-2">Número máximo de elementos:</label>
-                                        <div class="col-sm-4">
-                                            <input type="text" class="form-control" id="max" placeholder="max">
-                                        </div>
-                                    </div>-->
                                     <div class="form-group clearfix">
                                         <label class="control-label col-sm-2">Fecha de expiración:</label>
                                         <div class="col-sm-10">
