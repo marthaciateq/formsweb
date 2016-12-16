@@ -6,3 +6,11 @@ C:\proyectos\formsweb\formsweb\obj\Debug\formsweb.pdb
 C:\proyectos\formsweb\formsweb\bin\LibBase.dll
 C:\proyectos\formsweb\formsweb\bin\LibBase.pdb
 C:\proyectos\formsweb\formsweb\obj\Debug\formsweb.csprojResolveAssemblyReference.cache
+C:\ciateq\formsProyect\formsweb\formsweb\bin\formsweb.dll.config
+C:\ciateq\formsProyect\formsweb\formsweb\bin\formsweb.dll
+C:\ciateq\formsProyect\formsweb\formsweb\bin\formsweb.pdb
+C:\ciateq\formsProyect\formsweb\formsweb\bin\LibBase.dll
+C:\ciateq\formsProyect\formsweb\formsweb\bin\LibBase.pdb
+C:\ciateq\formsProyect\formsweb\formsweb\obj\Debug\formsweb.csprojResolveAssemblyReference.cache
+C:\ciateq\formsProyect\formsweb\formsweb\obj\Debug\formsweb.dll
+C:\ciateq\formsProyect\formsweb\formsweb\obj\Debug\formsweb.pdb
