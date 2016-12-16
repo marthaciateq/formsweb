@@ -1,22 +1,27 @@
+
 -- =============================================
--- Author:		Ángel Hernández
+-- Author:		ˆWngel Hernˆhndez
 -- Create date: 30 Sep 2016
 -- Description:	Obtiene Forms y su detalle por medio del id
 -- =============================================
 CREATE PROCEDURE [dbo].[sps_forms_detalle_buscar] 
 	-- Add the parameters for the stored procedure here
-	@idForm char(32)
-	, @start int
-	, @limit int
+	  @idSession VARCHAR(MAX)
+	, @idForm CHAR(32)
+	, @start INT
+	, @limit INT
 AS
 BEGIN
+	DECLARE @idUsuario VARCHAR(32);
+	
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
-
+	
+	EXECUTE sp_servicios_validar   @idSession, @@PROCID, @idUsuario OUTPUT
 		
 	-- Preguntas
-	SELECT dbo.trim(idFormElemento) AS idFormElemento
+	SELECT dbo.fn_trim(idFormElemento) AS idFormElemento
 			, elemento
 			, descripcion
 			, orden
@@ -34,35 +39,39 @@ BEGIN
 	SELECT * 
 	INTO #tmpElementosPaginados
 	FROM #tmpElementos
-	WHERE  ( [row] > @start OR  @start IS NULL ) AND ( [row] <= @start + @limit OR @start IS NULL );
+	WHERE  ( [row] > @start OR  @start IS NULL ) AND ( [row] <= @start + @limit OR @start IS NULL )
+	ORDER BY orden ASC;
 		
 	SELECT * FROM #tmpElementosPaginados;
 	
 	
 	-- Posibles Respuestas
-	SELECT	 dbo.trim(opcionesTable.idFelementoOpcion) AS idFelementoOpcion
-			, dbo.trim(opcionesTable.[idFormElemento]) AS idFormElemento
+	SELECT	 dbo.fn_trim(opcionesTable.idFelementoOpcion) AS idFelementoOpcion
+			, dbo.fn_trim(opcionesTable.[idFormElemento]) AS idFormElemento
 			, opcionesTable.[descripcion]
 			, opcionesTable.[orden]
-	From
+	FROM
 		[dbo].[felementosOpciones] AS opcionesTable
-	INNER JOIN #tmpElementosPaginados AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento ;
+	INNER JOIN #tmpElementosPaginados AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento
+	ORDER BY opcionesTable.orden ASC ;
 	
 	
 	-- Respuestas
-	SELECT dbo.trim(tmpElementos.[idFormElemento]) AS idFormElemento
-			, dbo.trim(idFelementoOpcion) AS idFelementoOpcion
+	SELECT dbo.fn_trim(tmpElementos.[idFormElemento]) AS idFormElemento
+			, dbo.fn_trim(dataTable.idFelementoOpcion) AS idFelementoOpcion
 			, dataTable.descripcion
 			, dataTable.fecha
 	FROM #tmpElementosPaginados AS tmpElementos
-	INNER JOIN [dbo].[elementsData] AS dataTable ON tmpElementos.idFormElemento = dataTable.idFormElemento;
+		INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON tmpElementos.idFormElemento = opcionesTable.idFormElemento
+		INNER JOIN [dbo].[elementsData] AS dataTable ON opcionesTable.idFelementoOpcion = dataTable.idFelementoOpcion   AND   idUsuario = @idUsuario
+	ORDER BY tmpElementos.orden ASC, opcionesTable.orden ASC;
 	
 	
 	IF ( @start = 0) BEGIN
 		-- Elementos Requeridos, estos solo deben enviarse una vez solamente al cliente
-		SELECT    dbo.trim(formsElementosTable.idFormElemento) AS idFormElemento
-				, COUNT(elementsDataTable.idFormElemento)   AS numRespuestas
-				, CAST( MAX( CAST(requerido AS TINYINT ) ) AS BIT )  AS requerido
+		SELECT    dbo.fn_trim(formsElementosTable.idFormElemento) AS idFormElemento
+				, COUNT(elementsDataTable.idFelementoOpcion)   AS numRespuestas
+				,  MAX( requerido )  AS requerido
 				, CAST( MAX( 
 							CASE WHEN LEN( ISNULL(elementsDataTable.descripcion, '') + CASE WHEN elementsDataTable.fecha IS NULL THEN 
 																							'' 
@@ -78,7 +87,8 @@ BEGIN
 						) AS BIT ) AS respuestaValida
 				, MAX([formsElementosTable].minimo) AS minimo
 		FROM [dbo].[formsElementos] AS formsElementosTable 
-			LEFT JOIN [dbo].[elementsData] AS elementsDataTable ON formsElementosTable.idFormElemento = elementsDataTable.idFormElemento
+			INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON formsElementosTable.idFormElemento = opcionesTable.idFormElemento
+			LEFT JOIN [dbo].[elementsData] AS elementsDataTable ON opcionesTable.idFelementoOpcion = elementsDataTable.idFelementoOpcion
 		WHERE  
 			idForm = @idForm 
 		GROUP BY formsElementosTable.idFormElemento;

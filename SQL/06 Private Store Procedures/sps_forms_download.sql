@@ -1,9 +1,9 @@
 -- =============================================
--- Author:		Ángel Hernández
+-- Author:		ˆWngel Hernˆhndez
 -- Create date: 25 Nov 2016
 -- Description:	Inicia la descarga del esquema formulario para poder trabajar offline
 -- =============================================
-CREATE PROCEDURE sps_forms_download
+CREATE PROCEDURE [dbo].[sps_forms_download] 
 	-- Add the parameters for the stored procedure here
 	@idSession varchar(MAX)
 	, @idForm char(32)
@@ -11,10 +11,8 @@ AS
 BEGIN
 	DECLARE @error      VARCHAR(MAX);
 	DECLARE @idUsuario  VARCHAR(32);
-	DECLARE @idFormDescarga CHAR(32);
 	
-	DECLARE @INICIADO INT = 1
-	DECLARE @FALLO INT = 2
+	DECLARE @INICIADO INT = 0
 	
 	-- 1= iniciado 2= Descargado 3 = Fallo
 
@@ -25,12 +23,10 @@ BEGIN
 	BEGIN TRY
 		
 		EXECUTE sp_servicios_validar   @idSession, @@PROCID, @idUsuario OUTPUT
-		-- 
-		EXECUTE sp_randomKey @idFormDescarga OUTPUT
 		
 		-- Registrar el intento de descarga
-		INSERT INTO formsDescargas ( idFormDescarga , idForm , idUsuario , fecha    , estatus   )
-							VALUES ( @idFormDescarga, @idForm, @idUsuario, GETDATE(), @INICIADO )
+		INSERT INTO bFormsUsuarios ( idForm , idUsuario , fecha    , estatus   )
+							VALUES ( @idForm, @idUsuario, GETDATE(), @INICIADO )
 		
 		-- Devolver los datos que se van a descargar
 		SELECT idform
@@ -38,8 +34,6 @@ BEGIN
 				, estatus
 				, titulo
 				, fcaducidad
-				-- Campo de referencia
-				, @idFormDescarga AS idFormDescarga
 		FROM 
 			[dbo].[forms]
 		WHERE idForm = @idForm;
@@ -56,7 +50,8 @@ BEGIN
 		FROM
 			[dbo].[formsElementos]
 		WHERE
-			idForm = @idForm ;
+			idForm = @idForm
+		ORDER BY orden ASC ;
 			
 			
 
@@ -69,17 +64,19 @@ BEGIN
 				, opcionesTable.[orden]
 		FROM
 			[dbo].[felementosOpciones] AS opcionesTable
-		Inner Join #tmpElementos AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento ;
+		INNER JOIN #tmpElementos AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento 
+		ORDER BY orden ASC;
 		
 		
 		-- Respuestas
 		SELECT tmpElementos.[idFormElemento]
-				, dbo.trim(dataTable.[idFelementoOpcion]) AS idFelementoOpcion
+				, dbo.fn_trim(dataTable.[idFelementoOpcion]) AS idFelementoOpcion
 				, dataTable.[descripcion]
 				, dataTable.[fecha]
 				, dataTable.[idUsuario]
 		FROM #tmpElementos AS tmpElementos
-		Inner Join [dbo].[elementsData] AS dataTable ON tmpElementos.idFormElemento = dataTable.idFormElemento;
+		INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON tmpElementos.idFormElemento = opcionesTable.idFormElemento
+		INNER JOIN [dbo].[elementsData] AS dataTable ON opcionesTable.idFelementoOpcion = dataTable.idFelementoOpcion AND dataTable.idUsuario = @idUsuario;
 		
 		
 		DROP TABLE #tmpElementos;
@@ -88,8 +85,6 @@ BEGIN
 	BEGIN CATCH
 		ROLLBACK TRANSACTION
 		SET @error = ERROR_MESSAGE()
-		
-		UPDATE formsDescargas SET estatus = @FALLO WHERE idFormDescarga = @idFormDescarga;
 		
 		EXECUTE sp_error 'S', @error
 	END CATCH

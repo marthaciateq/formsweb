@@ -11,6 +11,9 @@ CREATE PROCEDURE [dbo].[sps_forms_listar]
 AS
 BEGIN
 	DECLARE @idUsuario VARCHAR(MAX);
+	DECLARE @FINALIZADO INT = 2;
+	DECLARE @DESCARGADO INT = 1;
+	DECLARE @APROBADA INT = 1;
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
@@ -20,38 +23,65 @@ BEGIN
 	BEGIN TRY
 	
 		EXECUTE sp_servicios_validar @idSession, @@PROCID, @idUsuario OUTPUT;
+		
+		SELECT idForm, MAX(estatus) AS estatus
+		INTO #tmpFormsAprobados
+		FROM [dbo].[bForms]
+		GROUP BY idForm
+		HAVING MAX(estatus) = @APROBADA;
 
-		-- Formulario
+		
+		SELECT idForm, @idUsuario AS idUsuario, MAX (estatus) AS estatus
+		INTO #tmpFormsFinalizados
+		FROM [dbo].[bformsUsuarios]
+		WHERE idUsuario = @idUsuario
+		GROUP BY idForm
+		HAVING MAX(estatus) = @FINALIZADO;
+		
+		
+		
+		SELECT idForm, IdUsuario
+		INTO #tmpFormsUsuarios
+		FROM [dbo].[formsUsuarios] AS formsUsuariosTable
+		WHERE idUsuario = @idUsuario AND idForm NOT IN(
+			SELECT idForm FROM #tmpFormsFinalizados
+		);
+		
+		
+		------ Formulario
 		SELECT    formsTable.idForm
 				, descripcion
 				, formsTable.estatus
 				, titulo
 				, fcaducidad AS fCaducidad
-				, formsUsuariosTable.finalizado
 				, nombres + ' ' + apaterno + ' ' + amaterno AS nombreCompletoCreo
 				, ROW_NUMBER() OVER( ORDER BY formsTable.idForm ) AS row
 				, ( SELECT COUNT(idformElemento) AS numElementos FROM formsElementos WHERE idForm = formsTable.idForm) AS numElementos
-				, ( SELECT MAX(fecha) FROM formsDescargas WHERE idForm = formsTable.idForm AND idUsuario = @idUsuario) AS fechaDescarga 
+				, ( SELECT MAX(fecha) FROM [dbo].[bFormsUsuarios] AS bFormsUsuariosTable WHERE bFormsUsuariosTable.idForm = formsTable.idForm AND bFormsUsuariosTable.idUsuario = @idUsuario AND bFormsUsuariosTable.estatus = @DESCARGADO) AS fechaDescarga 
 				, minimo
 		INTO #tmpForms
 		FROM 
 			[dbo].[forms] AS formsTable
-			INNER JOIN [dbo].[bforms] AS bitacoraTable ON bitacoraTable.idForm = formsTable.idForm
-			INNER JOIN [dbo].[usuarios] AS usuariosTable ON bitacoraTable.idUsuario = usuariosTable.idUsuario
-			INNER JOIN [dbo].[formsUsuarios] AS formsUsuariosTable ON formsTable.idForm = formsUsuariosTable.idForm
-		WHERE
-			formsUsuariosTable.idUsuario = @idUsuario  AND formsUsuariosTable.finalizado = 0;
+			INNER JOIN #tmpFormsAprobados AS tmpFormsAprobados ON formsTable.idForm = tmpFormsAprobados.idForm
+			INNER JOIN #tmpFormsUsuarios AS tmpFormsUsuarios ON tmpFormsAprobados.idForm = tmpFormsUsuarios.idForm 
+			INNER JOIN [dbo].[Usuarios] AS usuariosTable ON tmpFormsUsuarios.idUsuario = usuariosTable.idUsuario
+		;
 			
 
+		
+
 			
-		-- Paginación
+		---- Paginación
 		SELECT * 
 		FROM #tmpForms
 		WHERE ( [row] > @start OR  @start IS NULL ) AND ( [row] <= @start + @limit OR @start IS NULL );
 			
 			
+		
+		DROP TABLE #tmpFormsAprobados;
+		DROP TABLE #tmpFormsFinalizados;
+		DROP TABLE #tmpFormsUsuarios
 		DROP TABLE #tmpForms;
-	
 	
 	END TRY
 	BEGIN CATCH
