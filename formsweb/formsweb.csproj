@@ -71,9 +71,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="pages\1p2uhrvu.m1d" />
-    <Content Include="pages\fxepb4id.bcq" />
-    <Content Include="pages\y4o2es3v.nw1" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -132,7 +129,9 @@
     <Content Include="pages\salir.html" />
     <Content Include="pages\test.html" />
     <Content Include="pages\usuarios.html" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.asax.cs">

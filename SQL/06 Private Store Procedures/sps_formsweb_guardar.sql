@@ -73,9 +73,7 @@ BEGIN
 			
 		declare @factual datetime; set @factual = GETUTCDATE()		
 		
-		
 		begin try
-		
 				declare @elemento int, @descripcion2 varchar(max),@minimo2 int, @orden int, @requerido char(1)
 				declare @idformElemento_ant int 
 				declare @idformElemento varchar(32)
@@ -98,7 +96,6 @@ BEGIN
 				declare insert_cursor cursor for 
 					select idformElemento,elemento,descripcion,minimo,orden,requerido from @telementos
 						
-				 
 				open insert_cursor
 					fetch next from insert_cursor into @idformElemento_ant,@elemento,@descripcion2,@minimo2,@orden,@requerido
 				while @@FETCH_STATUS=0

@@ -1,7 +1,6 @@
 CREATE TABLE formsUsuarios(
 	idform char(32) NOT NULL,
-	idusuario char(32) NOT NULL,
-	CONSTRAINT forms_idform PRIMARY KEY(idform)
+	idusuario char(32) NOT NULL
 ) 
 GO
 
