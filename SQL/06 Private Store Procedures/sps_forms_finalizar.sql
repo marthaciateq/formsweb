@@ -3,7 +3,7 @@
 -- Create date: 12 Dic 2016
 -- Description:	Finaliza la encuesta
 -- =============================================
-CREATE PROCEDURE sps_forms_finalizar
+CREATE PROCEDURE [dbo].[sps_forms_finalizar] 
 	-- Add the parameters for the stored procedure here
 	  @idSession VARCHAR(MAX)
 	, @idForm    CHAR(32)
@@ -15,6 +15,7 @@ BEGIN
 	DECLARE @UPDATE CHAR(1) = 'U';
 	DECLARE @DELETE CHAR(1) = 'D';
 	DECLARE @NEW    CHAR(1) = 'N';
+	DECLARE @FINALIZADO INT  = 2;
 	
 
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -30,26 +31,30 @@ BEGIN
 			
 			DELETE dataTable 
 			FROM [dbo].[formsElementos] AS elementosTable
-				INNER JOIN [dbo].[elementsData] AS dataTable ON elementosTable.idFormElemento = dataTable.idFormElemento
+				INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON elementosTable.idFormElemento = opcionesTable.idFormElemento
+				INNER JOIN [dbo].[elementsData] AS dataTable ON opcionesTable.idFelementoOpcion = dataTable.idFelementoOpcion
 			WHERE dataTable.idUsuario = @idUsuario;
 		
 		
 			SELECT    col1 AS idFelementoOpcion
 					, col2 AS idFormElemento
 					, col3 AS descripcion
-					, CAST(dbo.ownerDateFormatToStandarFormat(col4) AS DATETIME) AS fecha
+					, CAST(dbo.fn_ownerDateFormatToStandarFormat(col4) AS DATETIME) AS fecha
 			INTO #tmpUserDataTable
 			FROM fn_table(4, @datos) AS userDataTable;
 			
 			-- Insertar los datos que vienen de la DB local
-			INSERT INTO [dbo].[elementsData](idFormElemento, idFelementoOpcion, descripcion, fecha, idUsuario)
-			SELECT idFormElemento, idFelementoOpcion, descripcion,  CASE WHEN fecha = '' THEN NULL ELSE fecha END, @idUsuario
+			INSERT INTO [dbo].[elementsData]( idelementData, idFelementoOpcion, descripcion, fecha, idUsuario)
+			SELECT dbo.fn_randomKey(), idFelementoOpcion, descripcion,  CASE WHEN fecha = '' THEN NULL ELSE fecha END, @idUsuario
 			FROM #tmpUserDataTable;
 			
 			DROP TABLE #tmpUserDataTable;
 		
 			-- Marcar de finalizado
-			UPDATE [dbo].[formsUsuarios] SET finalizado = 1   WHERE   idForm = @idForm   AND   idUsuario = @idUsuario;
+			
+			-- Registrar el intento de descarga
+			INSERT INTO bFormsUsuarios ( idForm , idUsuario , fecha    , estatus   )
+							VALUES ( @idForm, @idUsuario, GETDATE(), @FINALIZADO )
 				
 			
 		
