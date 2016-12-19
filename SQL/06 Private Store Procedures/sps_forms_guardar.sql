@@ -1,5 +1,5 @@
 -- =============================================
--- Author:		ˆWngel Hernˆhndez
+-- Author:		?Wngel Hern?hndez
 -- Create date: 30 Sep 2016
 -- Description:	Guarda las respuestas de la encuesta
 -- =============================================
@@ -81,3 +81,4 @@ BEGIN
 	END CATCH
 	-- 
 END
+

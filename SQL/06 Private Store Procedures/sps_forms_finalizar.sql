@@ -1,5 +1,5 @@
 -- =============================================
--- Author:		Ángel Hernández
+-- Author:		Ãngel HernÃ¡ndez
 -- Create date: 12 Dic 2016
 -- Description:	Finaliza la encuesta
 -- =============================================
@@ -27,7 +27,7 @@ BEGIN
 		EXECUTE sp_servicios_validar   @idSession, @@PROCID, @idUsuario OUTPUT
 	
 		BEGIN TRANSACTION
-			-- Eliminar las respuestas que se encuentren en la DB remota ya que serán reemplazadas por los datos que vienen de la DB local
+			-- Eliminar las respuestas que se encuentren en la DB remota ya que serÃ¡n reemplazadas por los datos que vienen de la DB local
 			
 			DELETE dataTable 
 			FROM [dbo].[formsElementos] AS elementosTable
@@ -68,3 +68,4 @@ BEGIN
 	END CATCH
 	-- 
 END
+
