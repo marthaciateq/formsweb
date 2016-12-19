@@ -1,5 +1,5 @@
 -- =============================================
--- Author:		ˆWngel Hernˆhndez
+-- Author:		?Wngel Hern?hndez
 -- Create date: 30 Sep 2016
 -- Description:	Obtiene Forms y su detalle por medio del id
 -- =============================================
@@ -26,7 +26,7 @@ BEGIN
 			, orden
 			, requerido
 			, minimo
-			, row_number() OVER( ORDER BY idFormElemento ) AS row
+			, row_number() OVER( ORDER BY orden ) AS row
 	INTO #tmpElementos
 	FROM
 		formsElementos
@@ -85,13 +85,14 @@ BEGIN
 						
 						) AS BIT ) AS respuestaValida
 				, MAX([formsElementosTable].minimo) AS minimo
+				, MAX(formsElementosTable.orden) AS orden
 		FROM [dbo].[formsElementos] AS formsElementosTable 
 			INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON formsElementosTable.idFormElemento = opcionesTable.idFormElemento
 			LEFT JOIN [dbo].[elementsData] AS elementsDataTable ON opcionesTable.idFelementoOpcion = elementsDataTable.idFelementoOpcion
 		WHERE  
 			idForm = @idForm 
-		GROUP BY formsElementosTable.idFormElemento;
-	
+		GROUP BY formsElementosTable.idFormElemento
+		ORDER BY orden;
 	END
 	
 	
@@ -100,3 +101,4 @@ BEGIN
 	
 	
 END
+

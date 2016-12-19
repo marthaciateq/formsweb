@@ -1,5 +1,5 @@
 -- =============================================
--- Author:		ˆWngel Hernˆhndez
+-- Author:		?Wngel Hern?hndez
 -- Create date: 25 Nov 2016
 -- Description:	Inicia la descarga del esquema formulario para poder trabajar offline
 -- =============================================
@@ -45,7 +45,7 @@ BEGIN
 				, orden
 				, requerido
 				, minimo
-				, row_number() OVER( ORDER BY idFormElemento ) AS row
+				, row_number() OVER( ORDER BY orden ) AS row
 		INTO #tmpElementos
 		FROM
 			[dbo].[formsElementos]
@@ -65,7 +65,7 @@ BEGIN
 		FROM
 			[dbo].[felementosOpciones] AS opcionesTable
 		INNER JOIN #tmpElementos AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento 
-		ORDER BY orden ASC;
+		ORDER BY tmpElementos.orden ASC, opcionesTable.orden ASC;
 		
 		
 		-- Respuestas
@@ -90,3 +90,4 @@ BEGIN
 	END CATCH
 	
 END
+
