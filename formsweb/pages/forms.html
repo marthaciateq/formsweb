@@ -86,6 +86,13 @@
                     control.append(addOtOpcion("checkbox"));
                     sort($(element));
                     break;
+                case "Lista":
+                    type = "lista";
+                    control.find('#otoption').remove();
+                    control.append(addOption("lista"));
+                    control.append(addOtOpcion("lista"));
+                    sort($(element));
+                    break;
                 case "Fecha":
                     control.append(addFecha());
                     break;
@@ -133,7 +140,7 @@
             return elemento;
         }
         function addOptiontoControl(control, type) {
-            if(type!="radio" && type!="checkbox") type="radio";
+            if(type!="radio" && type!="checkbox" && type!="lista") type="radio";
             control.find('#otoption').remove();
             control.append(addOption(type));
             control.append(addOtOpcion(type));
@@ -141,7 +148,7 @@
         }
 
         function addOtOpcion(type) {
-            if (type != "radio" && type != "checkbox") type = "radio";
+            if (type != "radio" && type != "checkbox" && type!="lista") type = "radio";
             var otoption = $('<div id="otoption" class="col-sm-12"><a href="#" onclick="addOptiontoControl($(this).parent().parent(),'+"'"+type +"'"+ ')">Otra Opción</a></div>');
             otoption.addClass(type);
             return otoption;
@@ -157,22 +164,28 @@
             return hora;
         }
         function addOption(type,respuesta) {
-            var option, otoption, div, type;
+            var option, otoption, div, type, divControl;
             if (typeof (type) != "string") type = "radio";
-            if (type != "radio" && type != "checkbox") type = "radio";
+            if (type != "radio" && type != "checkbox" && type!="lista") type = "radio";
 
-            option = $('<div class="col-sm-12 opcion sortable"><div class="col-sm-10 pull-left"><input class=' + (type == "radio" ? 'radio' : 'checkbox') + ' pull-left " type="' + type + '" disabled/><input class="form-control respuesta input-sm" type="text" id="optiontext" placeholder="Opcion1"/></div><span onclick="removeOption($(this).parent())"><img src="../imgs/delete-icon.png" width="10px" height="10px"/></span></div>');
+            if (type == "lista") {
+                divControl = $('<div class="col-sm-10 pull-left"><input class="form-control respuesta input-sm lista" type="text" id="optiontext" placeholder="Opcion"/></div>');
+            } else {
+                divControl = $('<div class="col-sm-10 pull-left"><input class=' + (type == "radio" ? 'radio' : 'checkbox') + ' pull-left " type="' + type + '" disabled/><input class="form-control respuesta input-sm" type="text" id="optiontext" placeholder="Opcion"/></div>');
+            }
+            option = $('<div class="col-sm-12 opcion sortable"><span onclick="removeOption($(this).parent())"><img src="../imgs/delete-icon.png" width="10px" height="10px"/></span></div>');
+            option.prepend(divControl);
             option.addClass(type);
             if (respuesta != null) option.find(".respuesta").val(respuesta)
             return option;
         }
         function addRespuestaBreve() {
             var option;
-            option = $('<div class="col-sm-11 voffset1"><input class="form-control respuesta input-sm" type="text" id="respuesta" placeholder="Respuesta"></div>');
+            option = $('<div class="col-sm-11 voffset1"><input class="form-control respuesta input-sm rbreve" type="text" id="respuesta" placeholder="Respuesta"></div>');
             return option;
         }
         function createDropwndown() {
-            var list = [['Respuesta Breve', 'Opción múltiple', 'Casilla de Verificación'], ['Fecha', 'Hora']];
+            var list = [['Respuesta Breve', 'Opción múltiple', 'Casilla de Verificación','Lista'], ['Fecha', 'Hora']];
             var titulo = "Tipos de control";
             var div = $('<div class="dropdown pull-right"><button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' + titulo + '<span class="caret"></span></button></div>');
             var ul, li;
@@ -243,6 +256,13 @@
                                             break;
                                         case 4:
                                             control.append(addHora());
+                                            break;
+                                        case 5:
+                                            type = 'lista';
+                                            control.find('#otoption').remove();
+                                            control.append(addOption("lista", r[i].descripcionOpcion));
+                                            control.append(addOtOpcion("lista"));
+                                            sort($(element));
                                             break;
                                     }
                                     i++;
@@ -329,18 +349,21 @@
                 var opcion = [];
                 var control = $(element).find("#control");
                 elemento[0] = index+1
-                if (control.children(":first").children(":first").attr('type') == "text") {
+                if (control.children(":first").children(":first").attr('type') == "text" && control.children(":first").children(":first").hasClass("rbreve")) {
                     elemento[1] = 0; //textbox
                     opcion[0] = index+1;
                     opcion[1] = null;
                     opcion[2] = 1;
                     opciones.push(opcion);
                 } else {
-                    if (control.children(":first").children(":first").children(":first").attr('type') == "radio" || control.children(":first").children(":first").children(":first").attr('type') == "checkbox") {
+                    if (control.children(":first").children(":first").children(":first").attr('type') == "radio" || control.children(":first").children(":first").children(":first").attr('type') == "checkbox" || control.children(":first").children(":first").children(":first").attr('type') == "text") {
+
                         type = control.children(":first").children(":first").children(":first").attr('type');
 
                         if (type=="radio") elemento[1] = 1;
-                        else elemento[1] = 2 //Checkbox
+                        else
+                           if (type == "checkbox") elemento[1] = 2 //Checkbox
+                           else elemento[1] = 5 //Lista
 
                         var orden2 = 0;
                         control.find(".respuesta").each(function (index2, elemento) {
@@ -372,6 +395,7 @@
                                 alert("otro control");
                             }
                         }
+
                     }
                 }
                 elemento[2] = Mi.MiTextVal($(element).find(".delemento"));
@@ -388,7 +412,7 @@
                     titulo: $("#titulo").val().length == 0 ? null : $("#titulo").val(),
                     descripcion: $("#descripcion").val() == '' ? null : $("#descripcion").val(),
                     fcaducidad: $("#fcaducidad").val() == '' ? null : $("#fcaducidad").val(),
-                    minimo: $("#minimo").val(),
+                    minimo: Mi.MiNumberMiVal($("#minimo"),0,null),
                     elementos: elementos,
                     opciones: opciones,
                     validador: row ? row.validador : null

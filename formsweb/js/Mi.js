@@ -347,10 +347,10 @@ Mi.MiTextVal = function (e, value) {
     }
 }
 
-Mi.MiNumberMiVal = function (e, value) {
+Mi.MiNumberMiVal = function (e, value,decimales,separador) {
     if ($.type(value) == 'undefined') return Mi.Convert.stringToNumber(e.val())
     else {
         if (!$.isNumeric(parseFloat(value))) e.val('')
-        else e.val(Mi.Convert.numberToString(value, e.data('params').decimales, e.data('params').separador))
+        else e.val(Mi.Convert.numberToString(value, decimales,separador))
     }
 }

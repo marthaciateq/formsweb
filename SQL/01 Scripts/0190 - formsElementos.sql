@@ -12,7 +12,7 @@ CREATE TABLE formsElementos(
 GO
 
 ALTER TABLE formsElementos ADD  CONSTRAINT FK_formsElementos_idform FOREIGN KEY(idform)
-REFERENCES forms (idform)
+REFERENCES forms (idform) ON DELETE CASCADE
 GO
 
 

@@ -78,7 +78,10 @@
                     }
                 });
                 Mi.AJAX.request({
-                    data: { NAME: 'spp_forms_buscar' },
+                    data: {
+                        NAME: 'spp_forms_buscar',
+                        estados: '1'
+                    },
                     onsuccess: function (r) {
                         var e = Mi.Input.combo({ multiple: "true" });
                         e.MiFill(r, { value: 'idform', text: 'titulo' });

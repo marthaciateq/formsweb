@@ -101,10 +101,10 @@ BEGIN
 				while @@FETCH_STATUS=0
 				begin
 					
-					if @descripcion2 is null insert into @terrores values('Favor de capturar la descripción del elemento con orden: '+ cast(@orden+1 as varchar(max)))
+					if @descripcion2 is null insert into @terrores values('Favor de capturar la descripción del elemento con orden: '+ cast(@orden as varchar(max)))
 					if @orden is null insert into @terrores values('Favor de capturar el orden del elemento con descripcion: '+@descripcion2+'.')
-					if @requerido is null insert into @terrores values('Favor de capturar si el elemento con orden:'+ cast(@orden+1 as varchar(max))+' es requerido.')					
-					if @elemento is null insert into @terrores values('Favor de capturar el tipo de control del elemento con orden:'+ cast(@orden+1 as varchar(max)))					
+					if @requerido is null insert into @terrores values('Favor de capturar si el elemento con orden:'+ cast(@orden as varchar(max))+' es requerido.')					
+					if @elemento is null insert into @terrores values('Favor de capturar el tipo de control del elemento con orden:'+ cast(@orden as varchar(max)))					
 
 					insert into @terrores
 					select 
@@ -136,7 +136,7 @@ BEGIN
 					if @idform is null
 					begin
 						execute sp_randomKey @idform output
-						insert into forms values(@idform,@titulo,@descripcion,@minimo,0,@fcaducidad)
+						insert into forms values(@idform,@titulo,@descripcion,NULLIF(@minimo,''),0,@fcaducidad)
 					end
 					else
 					begin 
@@ -156,7 +156,7 @@ BEGIN
 					
 					insert into felementosOpciones
 						select * from @felementosOpciones
-					
+						
 					insert into bforms values(@idform, @idusuarioSESION, @factual, 0, @comentarios)					
 				commit
 			end
