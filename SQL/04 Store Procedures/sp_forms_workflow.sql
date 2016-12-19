@@ -49,7 +49,9 @@ BEGIN
 				
 				if @operacion = 'BORRAR' 
 				begin
-					if (select count(*) from formsElementos where idform=@idform)>0
+					if (select count(*) from formsElementos a
+							inner join felementosOpciones b on a.idformElemento=b.idformElemento 
+							inner join elementsData c on b.idfelementoOpcion=c.idelementData and a.idform=@idform)>0
 					begin
 						set @error = 'El formulario tiene respuestas relacionadas por lo que no puede ser BORRADO'					
 						execute sp_error 'U', @error
@@ -59,10 +61,9 @@ BEGIN
 				else 
 				begin
 					update forms set estatus = @estatus where idform = @idform and estatus in (select estatus from @estatusActualesPermisibles) 					
+					if @@ROWCOUNT <> 1 execute sp_error 'U', 'El formulario ha sido modificado concurrentemente en otra sesión.'
 				end
-				if @@ROWCOUNT <> 1 execute sp_error 'U', 'El formulario ha sido modificado concurrentemente en otra sesión.'
-				insert into bforms values(@idform, @idusuario, @factual, @estatus, @comentarios)
-				
+					insert into bforms values(@idform, @idusuario, @factual, @estatus, @comentarios)					
 			commit
 		end try
 		begin catch

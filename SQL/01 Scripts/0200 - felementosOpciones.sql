@@ -8,6 +8,6 @@ CREATE TABLE felementosOpciones(
 GO
 
 ALTER TABLE felementosOpciones ADD CONSTRAINT FK_felementosOpciones_idformElement FOREIGN KEY(idformElemento)
-REFERENCES formsElementos (idformElemento)
+REFERENCES formsElementos (idformElemento) ON DELETE CASCADE
 GO
 
