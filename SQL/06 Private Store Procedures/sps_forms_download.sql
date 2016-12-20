@@ -12,7 +12,9 @@ BEGIN
 	DECLARE @error      VARCHAR(MAX);
 	DECLARE @idUsuario  VARCHAR(32);
 	
-	DECLARE @INICIADO INT = 0
+	DECLARE @INICIADO INT = 0;
+	DECLARE @CADUCADA BIT = 0;
+	DECLARE @CANCELADA BIT = 0;
 	
 	-- 1= iniciado 2= Descargado 3 = Fallo
 
@@ -24,70 +26,98 @@ BEGIN
 		
 		EXECUTE sp_servicios_validar   @idSession, @@PROCID, @idUsuario OUTPUT
 		
-		-- Registrar el intento de descarga
-		INSERT INTO bFormsUsuarios ( idForm , idUsuario , fecha    , estatus   )
-							VALUES ( @idForm, @idUsuario, GETDATE(), @INICIADO )
+		SELECT @CADUCADA = CASE WHEN( dbo.fn_dateTimeToDate( GETDATE()) > dbo.fn_dateTimeToDate( fcaducidad ) ) THEN 1 ELSE 0 END FROM [dbo].[forms] WHERE idForm = @idForm;
 		
-		-- Devolver los datos que se van a descargar
-		SELECT idform
-				, descripcion
-				, estatus
-				, titulo
-				, fcaducidad
-		FROM 
-			[dbo].[forms]
-		WHERE idForm = @idForm;
+		IF ( @CADUCADA = 1 ) 
+			execute sp_error 'U', 'No es posible descargar la encuesta porque ya ha caducado.'
+		ELSE BEGIN
+			SELECT @CANCELADA = CASE WHEN estatus = 9 THEN 1 ELSE 0 END FROM forms WHERE idForm = @idForm;
+		
+			IF ( @CANCELADA = 1 )
+				execute sp_error 'U', 'No es posible descargar la encuesta porque ha sido cancelada por el enviador.'
+			ELSE BEGIN
+				BEGIN TRY
+				BEGIN TRANSACTION;
 			
-		-- Preguntas
-		SELECT idFormElemento
-				, elemento
-				, descripcion
-				, orden
-				, requerido
-				, minimo
-				, row_number() OVER( ORDER BY orden ) AS row
-		INTO #tmpElementos
-		FROM
-			[dbo].[formsElementos]
-		WHERE
-			idForm = @idForm
-		ORDER BY orden ASC ;
-			
-			
+					-- Registrar el intento de descarga
+					INSERT INTO bFormsUsuarios ( idForm , idUsuario , fecha    , estatus   )
+										VALUES ( @idForm, @idUsuario, GETDATE(), @INICIADO )
+					
+					-- Devolver los datos que se van a descargar
+					SELECT idform
+							, descripcion
+							, estatus
+							, titulo
+							, fcaducidad
+					FROM 
+						[dbo].[forms]
+					WHERE idForm = @idForm;
+						
+					-- Preguntas
+					SELECT idFormElemento
+							, elemento
+							, descripcion
+							, orden
+							, requerido
+							, minimo
+							, row_number() OVER( ORDER BY orden ) AS row
+					INTO #tmpElementos
+					FROM
+						[dbo].[formsElementos]
+					WHERE
+						idForm = @idForm
+					ORDER BY orden ASC ;
+						
+						
 
-		SELECT * FROM #tmpElementos;
+					SELECT * FROM #tmpElementos;
+					
+					-- Posibles Respuestas
+					SELECT	 idFelementoOpcion
+							, opcionesTable.[idFormElemento]
+							, opcionesTable.[descripcion]
+							, opcionesTable.[orden]
+					FROM
+						[dbo].[felementosOpciones] AS opcionesTable
+					INNER JOIN #tmpElementos AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento 
+					ORDER BY tmpElementos.orden ASC, opcionesTable.orden ASC;
+					
+					
+					-- Respuestas
+					SELECT tmpElementos.[idFormElemento]
+							, dbo.fn_trim(dataTable.[idFelementoOpcion]) AS idFelementoOpcion
+							, dataTable.[descripcion]
+							, dataTable.[fecha]
+							, dataTable.[idUsuario]
+					FROM #tmpElementos AS tmpElementos
+					INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON tmpElementos.idFormElemento = opcionesTable.idFormElemento
+					INNER JOIN [dbo].[elementsData] AS dataTable ON opcionesTable.idFelementoOpcion = dataTable.idFelementoOpcion AND dataTable.idUsuario = @idUsuario;
+					
+					
+					
+					DROP TABLE #tmpElementos;
+				
+				COMMIT TRANSACTION;
+				
+				END TRY
+				BEGIN CATCH
+					ROLLBACK TRANSACTION;
+					SET @error = ERROR_MESSAGE();
+					
+					EXECUTE sp_error 'S', @error;
+				END CATCH
+				
+			END -- Cancelada
 		
-		-- Posibles Respuestas
-		SELECT	 idFelementoOpcion
-				, opcionesTable.[idFormElemento]
-				, opcionesTable.[descripcion]
-				, opcionesTable.[orden]
-		FROM
-			[dbo].[felementosOpciones] AS opcionesTable
-		INNER JOIN #tmpElementos AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento 
-		ORDER BY tmpElementos.orden ASC, opcionesTable.orden ASC;
-		
-		
-		-- Respuestas
-		SELECT tmpElementos.[idFormElemento]
-				, dbo.fn_trim(dataTable.[idFelementoOpcion]) AS idFelementoOpcion
-				, dataTable.[descripcion]
-				, dataTable.[fecha]
-				, dataTable.[idUsuario]
-		FROM #tmpElementos AS tmpElementos
-		INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON tmpElementos.idFormElemento = opcionesTable.idFormElemento
-		INNER JOIN [dbo].[elementsData] AS dataTable ON opcionesTable.idFelementoOpcion = dataTable.idFelementoOpcion AND dataTable.idUsuario = @idUsuario;
-		
-		
-		DROP TABLE #tmpElementos;
+		END -- Caducado
 		
 	END TRY
 	BEGIN CATCH
-		ROLLBACK TRANSACTION
-		SET @error = ERROR_MESSAGE()
+		SET @error = ERROR_MESSAGE();
 		
-		EXECUTE sp_error 'S', @error
+		EXECUTE sp_error 'S', @error;
 	END CATCH
 	
 END
+
 
