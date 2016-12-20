@@ -65,6 +65,7 @@ BEGIN
 			INNER JOIN #tmpFormsAprobados AS tmpFormsAprobados ON formsTable.idForm = tmpFormsAprobados.idForm
 			INNER JOIN #tmpFormsUsuarios AS tmpFormsUsuarios ON tmpFormsAprobados.idForm = tmpFormsUsuarios.idForm 
 			INNER JOIN [dbo].[Usuarios] AS usuariosTable ON tmpFormsUsuarios.idUsuario = usuariosTable.idUsuario
+		WHERE dbo.fn_dateTimeToDate( formsTable.fcaducidad ) >= dbo.fn_dateTimeToDate( GETDATE() )
 		;
 			
 
@@ -90,4 +91,5 @@ BEGIN
 	END CATCH
 	
 END
+
 

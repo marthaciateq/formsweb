@@ -86,6 +86,7 @@ BEGIN
 						) AS BIT ) AS respuestaValida
 				, MAX([formsElementosTable].minimo) AS minimo
 				, MAX(formsElementosTable.orden) AS orden
+				, MAX (formsElementosTable.elemento) AS elemento
 		FROM [dbo].[formsElementos] AS formsElementosTable 
 			INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON formsElementosTable.idFormElemento = opcionesTable.idFormElemento
 			LEFT JOIN [dbo].[elementsData] AS elementsDataTable ON opcionesTable.idFelementoOpcion = elementsDataTable.idFelementoOpcion
@@ -101,4 +102,5 @@ BEGIN
 	
 	
 END
+
 
