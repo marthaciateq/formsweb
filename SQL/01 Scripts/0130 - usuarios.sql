@@ -16,7 +16,6 @@ CREATE UNIQUE INDEX IX_usuarios_01 on usuarios(login)
 GO
 
 BEGIN
-	insert into usuarios values('20160617194441460203936886013010','Martha Ericka','Trejo','Herrera','marthae.trejo@gmail.com','mtrejo','0OstU0qU6t5','N')
-	insert into usuarios values('20160617194441460997471614919941','Jose Angel','Hernández','Hernandez','jangel@ciateq.mx','jangel','5sMxyURyat5','N')
+	insert into usuarios values('20160617194441460203936886013010','Administrador','.','.','admin@gmail.com','admin','0OstU0qU6t5','N')
 END
 
