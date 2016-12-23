@@ -7,6 +7,8 @@ CREATE PROCEDURE [dbo].[sps_forms_download]
 	-- Add the parameters for the stored procedure here
 	@idSession varchar(MAX)
 	, @idForm char(32)
+	, @latitud   DECIMAL(18, 10)
+	, @longitud  DECIMAL(18, 10)
 AS
 BEGIN
 	DECLARE @error      VARCHAR(MAX);
@@ -40,11 +42,11 @@ BEGIN
 				BEGIN TRANSACTION;
 			
 					-- Registrar el intento de descarga
-					INSERT INTO bFormsUsuarios ( idForm , idUsuario , fecha    , estatus   )
-										VALUES ( @idForm, @idUsuario, GETDATE(), @INICIADO )
+					INSERT INTO bFormsUsuarios ( idFormUsuario     , idForm , idUsuario , fecha    , estatus    , latitud , longitud )
+										VALUES ( dbo.fn_randomKey(), @idForm, @idUsuario, GETDATE(), @INICIADO, @latitud, @longitud )										
 					
 					-- Devolver los datos que se van a descargar
-					SELECT idform
+					SELECT idForm
 							, descripcion
 							, estatus
 							, titulo
@@ -82,17 +84,7 @@ BEGIN
 					INNER JOIN #tmpElementos AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento 
 					ORDER BY tmpElementos.orden ASC, opcionesTable.orden ASC;
 					
-					
-					-- Respuestas
-					SELECT tmpElementos.[idFormElemento]
-							, dbo.fn_trim(dataTable.[idFelementoOpcion]) AS idFelementoOpcion
-							, dataTable.[descripcion]
-							, dataTable.[fecha]
-							, dataTable.[idUsuario]
-					FROM #tmpElementos AS tmpElementos
-					INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON tmpElementos.idFormElemento = opcionesTable.idFormElemento
-					INNER JOIN [dbo].[elementsData] AS dataTable ON opcionesTable.idFelementoOpcion = dataTable.idFelementoOpcion AND dataTable.idUsuario = @idUsuario;
-					
+			
 					
 					
 					DROP TABLE #tmpElementos;
@@ -119,5 +111,6 @@ BEGIN
 	END CATCH
 	
 END
+
 
 

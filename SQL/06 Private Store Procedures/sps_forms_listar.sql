@@ -31,22 +31,11 @@ BEGIN
 		HAVING MAX(estatus) = @APROBADA;
 
 		
-		SELECT idForm, @idUsuario AS idUsuario, MAX (estatus) AS estatus
-		INTO #tmpFormsFinalizados
-		FROM [dbo].[bformsUsuarios]
-		WHERE idUsuario = @idUsuario
-		GROUP BY idForm
-		HAVING MAX(estatus) = @FINALIZADO;
-		
-		
 		
 		SELECT idForm, IdUsuario
 		INTO #tmpFormsUsuarios
 		FROM [dbo].[formsUsuarios] AS formsUsuariosTable
-		WHERE idUsuario = @idUsuario AND idForm NOT IN(
-			SELECT idForm FROM #tmpFormsFinalizados
-		);
-		
+		WHERE idUsuario = @idUsuario;
 		
 		------ Formulario
 		SELECT    formsTable.idForm
@@ -65,7 +54,6 @@ BEGIN
 			INNER JOIN #tmpFormsAprobados AS tmpFormsAprobados ON formsTable.idForm = tmpFormsAprobados.idForm
 			INNER JOIN #tmpFormsUsuarios AS tmpFormsUsuarios ON tmpFormsAprobados.idForm = tmpFormsUsuarios.idForm 
 			INNER JOIN [dbo].[Usuarios] AS usuariosTable ON tmpFormsUsuarios.idUsuario = usuariosTable.idUsuario
-		WHERE dbo.fn_dateTimeToDate( formsTable.fcaducidad ) >= dbo.fn_dateTimeToDate( GETDATE() )
 		;
 			
 
@@ -80,7 +68,7 @@ BEGIN
 			
 		
 		DROP TABLE #tmpFormsAprobados;
-		DROP TABLE #tmpFormsFinalizados;
+		--DROP TABLE #tmpFormsFinalizados;
 		DROP TABLE #tmpFormsUsuarios
 		DROP TABLE #tmpForms;
 	
