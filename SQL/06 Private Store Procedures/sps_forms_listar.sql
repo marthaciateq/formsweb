@@ -46,7 +46,7 @@ BEGIN
 				, nombres + ' ' + apaterno + ' ' + amaterno AS nombreCompletoCreo
 				, ROW_NUMBER() OVER( ORDER BY formsTable.idForm ) AS row
 				, ( SELECT COUNT(idformElemento) AS numElementos FROM formsElementos WHERE idForm = formsTable.idForm) AS numElementos
-				, ( SELECT MAX(fecha) FROM [dbo].[bFormsUsuarios] AS bFormsUsuariosTable WHERE bFormsUsuariosTable.idForm = formsTable.idForm AND bFormsUsuariosTable.idUsuario = @idUsuario AND bFormsUsuariosTable.estatus = @DESCARGADO) AS fechaDescarga 
+				, 'R' AS origen
 				, minimo
 		INTO #tmpForms
 		FROM 
@@ -79,5 +79,4 @@ BEGIN
 	END CATCH
 	
 END
-
 

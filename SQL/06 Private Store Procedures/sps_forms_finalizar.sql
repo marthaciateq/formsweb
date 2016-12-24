@@ -51,8 +51,8 @@ BEGIN
 				
 				
 					SELECT    col1 AS idFelementoOpcion
-							, col3 AS descripcion
-							, CAST(dbo.fn_ownerDateFormatToStandarFormat(col4) AS DATETIME) AS fecha
+							, col2 AS descripcion
+							, CAST(dbo.fn_ownerDateFormatToStandarFormat(col3) AS DATETIME) AS fecha
 					INTO #tmpUserDataTable
 					FROM fn_table(3, @datos) AS userDataTable;
 					

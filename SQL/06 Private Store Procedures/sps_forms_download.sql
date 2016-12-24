@@ -84,7 +84,17 @@ BEGIN
 					INNER JOIN #tmpElementos AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento 
 					ORDER BY tmpElementos.orden ASC, opcionesTable.orden ASC;
 					
-			
+					
+					------ Respuestas
+					----SELECT tmpElementos.[idFormElemento]
+					----		, dbo.fn_trim(dataTable.[idFelementoOpcion]) AS idFelementoOpcion
+					----		, dataTable.[descripcion]
+					----		, dataTable.[fecha]
+					----		, dataTable.[idUsuario]
+					----FROM #tmpElementos AS tmpElementos
+					----INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON tmpElementos.idFormElemento = opcionesTable.idFormElemento
+					----INNER JOIN [dbo].[elementsData] AS dataTable ON opcionesTable.idFelementoOpcion = dataTable.idFelementoOpcion AND dataTable.idUsuario = @idUsuario;
+					
 					
 					
 					DROP TABLE #tmpElementos;

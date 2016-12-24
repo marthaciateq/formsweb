@@ -22,7 +22,7 @@ BEGIN
 	BEGIN TRY
 	
 		BEGIN TRANSACTION
-
+		
 			EXECUTE sp_servicios_validar   @idSession, @@PROCID, @idUsuario OUTPUT
 		
 			-- Registrar el intento de descarga
