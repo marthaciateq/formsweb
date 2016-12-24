@@ -2,8 +2,8 @@ CREATE TABLE elementsData(
 	idelementData char(32) NOT NULL,
 	idfelementoOpcion char(32) NOT NULL,
 	idFormUsuario char(32) NOT NULL,
-	descripcion varchar(512) NULL,
-	fecha datetime NULL,
+	descripcion varchar(512),
+	fecha datetime,
 	CONSTRAINT elementsData_idelementData PRIMARY KEY(idelementData)
 ) 
 GO
