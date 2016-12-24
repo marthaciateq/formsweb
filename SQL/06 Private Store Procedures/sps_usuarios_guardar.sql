@@ -43,12 +43,12 @@ BEGIN
 					if @password is not null
 					begin
 						execute sp_enc @password output			
-						update usuarios set password = @password,nombres=@nombre,apaterno=@apaterno,amaterno=@amaterno,
-							correo=@correo
+						update usuarios set password = @password
 						 where idusuario = @idusuario
 					end		
 												
-					update usuarios set login = @login, deleted = @deleted 
+					update usuarios set login = @login, deleted = @deleted, nombres=@nombre,apaterno=@apaterno,amaterno=@amaterno,
+							correo=@correo
 					where idusuario = @idusuario
 					
 					delete from rolesUsuarios where idusuario = @idusuario
