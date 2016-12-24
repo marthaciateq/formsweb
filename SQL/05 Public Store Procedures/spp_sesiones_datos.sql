@@ -1,4 +1,4 @@
-CREATE PROCEDURE spp_sesiones_datos 
+CREATE PROCEDURE [dbo].[spp_sesiones_datos] 
 	@idsesion varchar(max)
 AS
 BEGIN
@@ -10,6 +10,7 @@ BEGIN
 		select
 			@idsesion idsesion,
 			login
+			, @idusuarioSESION AS idusuario
 		from v_usuarios
 		where idusuario = @idusuarioSESION
 
