@@ -35,12 +35,12 @@ BEGIN
 		SELECT @CADUCADA = CASE WHEN( dbo.fn_dateTimeToDate( GETDATE()) > dbo.fn_dateTimeToDate( fcaducidad ) ) THEN 1 ELSE 0 END FROM [dbo].[forms] WHERE idForm = @idForm;
 		
 		IF ( @CADUCADA = 1 ) 
-			execute sp_error 'U', 'No es posible finalizar la encuesta porque ya ha caducado.'
+			execute sp_error 'U', 'No es posible finalizar el formulario porque ya ha caducado.'
 		ELSE BEGIN
 			SELECT @CANCELADA = CASE WHEN estatus = 9 THEN 1 ELSE 0 END FROM forms WHERE idForm = @idForm;
 		
 			IF ( @CANCELADA = 1 )
-				execute sp_error 'U', 'No es posible finalizar la encuesta porque ha sido cancelada por el enviador.'
+				execute sp_error 'U', 'No es posible finalizar el formulario porque ha sido cancelada por el enviador.'
 			ELSE BEGIN
 			
 				BEGIN TRY

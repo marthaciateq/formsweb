@@ -31,12 +31,12 @@ BEGIN
 		SELECT @CADUCADA = CASE WHEN( dbo.fn_dateTimeToDate( GETDATE()) > dbo.fn_dateTimeToDate( fcaducidad ) ) THEN 1 ELSE 0 END FROM [dbo].[forms] WHERE idForm = @idForm;
 		
 		IF ( @CADUCADA = 1 ) 
-			execute sp_error 'U', 'No es posible descargar la encuesta porque ya ha caducado.'
+			execute sp_error 'U', 'No es posible descargar el formulario porque ya ha caducado.'
 		ELSE BEGIN
 			SELECT @CANCELADA = CASE WHEN estatus = 9 THEN 1 ELSE 0 END FROM forms WHERE idForm = @idForm;
 		
 			IF ( @CANCELADA = 1 )
-				execute sp_error 'U', 'No es posible descargar la encuesta porque ha sido cancelada por el enviador.'
+				execute sp_error 'U', 'No es posible descargar el formulario porque ha sido cancelada por el enviador.'
 			ELSE BEGIN
 				BEGIN TRY
 				BEGIN TRANSACTION;
@@ -50,7 +50,7 @@ BEGIN
 							, descripcion
 							, estatus
 							, titulo
-							, fcaducidad
+							, fcaducidad AS fCaducidad
 					FROM 
 						[dbo].[forms]
 					WHERE idForm = @idForm;
@@ -84,19 +84,7 @@ BEGIN
 					INNER JOIN #tmpElementos AS tmpElementos ON tmpElementos.idFormElemento = opcionesTable.idFormElemento 
 					ORDER BY tmpElementos.orden ASC, opcionesTable.orden ASC;
 					
-					
-					------ Respuestas
-					----SELECT tmpElementos.[idFormElemento]
-					----		, dbo.fn_trim(dataTable.[idFelementoOpcion]) AS idFelementoOpcion
-					----		, dataTable.[descripcion]
-					----		, dataTable.[fecha]
-					----		, dataTable.[idUsuario]
-					----FROM #tmpElementos AS tmpElementos
-					----INNER JOIN [dbo].[fElementosOpciones] AS opcionesTable ON tmpElementos.idFormElemento = opcionesTable.idFormElemento
-					----INNER JOIN [dbo].[elementsData] AS dataTable ON opcionesTable.idFelementoOpcion = dataTable.idFelementoOpcion AND dataTable.idUsuario = @idUsuario;
-					
-					
-					
+	
 					DROP TABLE #tmpElementos;
 				
 				COMMIT TRANSACTION;
@@ -121,6 +109,7 @@ BEGIN
 	END CATCH
 	
 END
+
 
 
 
