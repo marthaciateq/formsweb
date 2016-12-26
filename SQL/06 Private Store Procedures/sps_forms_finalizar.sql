@@ -48,6 +48,11 @@ BEGIN
 					-- Registrar la finalizaciÃ³n de la encuesta
 					
 					SET @idFormUsuario = dbo.fn_randomKey();
+                    
+                    
+                    -- Registrar la finalizacion de la encuesta
+					INSERT INTO bFormsUsuarios ( idFormUsuario, idForm , idUsuario     , estatus, fecha, latitud, longitud   )
+									VALUES ( @idFormUsuario, @idForm, @idUsuario, @FINALIZADO, GETDATE(), @latitud, @longitud )	
 				
 				
 					SELECT    col1 AS idFelementoOpcion
@@ -64,9 +69,7 @@ BEGIN
 					DROP TABLE #tmpUserDataTable;
 				
 					
-					-- Registrar la finalizacion de la encuesta
-					INSERT INTO bFormsUsuarios ( idFormUsuario, idForm , idUsuario     , estatus, fecha, latitud, longitud   )
-									VALUES ( @idFormUsuario, @idForm, @idUsuario, @FINALIZADO, GETDATE(), @latitud, @longitud )	
+					
 						
 					
 				
